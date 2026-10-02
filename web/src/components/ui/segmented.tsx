@@ -10,7 +10,7 @@ const THUMB = { type: 'spring' as const, bounce: 0.15, duration: 0.35 };
 
 function Track({ children, className, full }: { children: React.ReactNode; className?: string; full?: boolean }) {
   return (
-    <div className={cn('no-scrollbar flex overflow-x-auto rounded-[9px] bg-fill p-[2px] lg:rounded-[7px]', full ? 'w-full' : 'inline-flex max-w-full', className)} role="tablist">
+    <div className={cn('no-scrollbar flex overflow-x-auto rounded-[9px] bg-fill p-[2px] lg:rounded-[7px]', full ? 'w-full' : 'inline-flex min-w-0 max-w-full', className)} role="tablist">
       {children}
     </div>
   );
