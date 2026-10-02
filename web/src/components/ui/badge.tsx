@@ -38,7 +38,14 @@ const STATUS: Record<string, { label: string; tone: Tone }> = {
   mixed: { label: 'Mixed', tone: 'blue' },
 };
 
-export function StatusBadge({ status, overdue }: { status: string; overdue?: boolean }) {
-  const s = overdue ? STATUS.overdue! : STATUS[status] ?? { label: status, tone: 'gray' as Tone };
+const CREDIT: Record<string, { label: string; tone: Tone }> = {
+  sent: { label: 'Issued', tone: 'blue' },
+  partial: { label: 'Partly applied', tone: 'orange' },
+  paid: { label: 'Applied', tone: 'accent' },
+};
+
+export function StatusBadge({ status, overdue, kind }: { status: string; overdue?: boolean; kind?: string | null }) {
+  const credit = kind === 'credit_note' ? CREDIT[status] : undefined;
+  const s = overdue ? STATUS.overdue! : credit ?? STATUS[status] ?? { label: status, tone: 'gray' as Tone };
   return <Badge tone={s.tone}>{s.label}</Badge>;
 }

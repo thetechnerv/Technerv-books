@@ -55,13 +55,18 @@ export async function gstForFiscalYear(fy: number, yearEnd: string) {
   return { ...r, ...(await gstSummary(r.start, r.end)) };
 }
 
-/** Revenue (pre-tax, CAD) vs business spending per month for the last `months` months. */
+/**
+ * Revenue (pre-tax, CAD) vs business spending per month for the last `months` months.
+ * Spending matches Reports: the business share of each expense net of the ITC
+ * claimed back, excluding capital purchases (those go to CCA), plus mileage.
+ */
 export async function monthlySeries(months = 12) {
   const supabase = await db();
   const from = format(startOfMonth(subMonths(new Date(), months - 1)), 'yyyy-MM-dd');
-  const [docs, exps] = await Promise.all([
+  const [docs, exps, trips] = await Promise.all([
     supabase.from('invoices').select('kind, issue_date, subtotal, discount, fx_rate').in('kind', ['invoice', 'credit_note']).not('status', 'in', '(draft,void)').gte('issue_date', from),
-    supabase.from('expense_overview').select('spent_on, total_cad, effective_business_pct').gte('spent_on', from),
+    supabase.from('expense_overview').select('spent_on, total_cad, effective_business_pct, itc_cad, is_capital').gte('spent_on', from),
+    supabase.from('mileage_trips').select('trip_on, km, rate_per_km').gte('trip_on', from),
   ]);
   const buckets = new Map<string, { month: string; in: number; out: number }>();
   for (let i = months - 1; i >= 0; i--) {
@@ -73,8 +78,13 @@ export async function monthlySeries(months = 12) {
     if (b) b.in += (d.kind === 'credit_note' ? -1 : 1) * (num(d.subtotal) - num(d.discount)) * num(d.fx_rate);
   }
   for (const e of must(exps)) {
+    if (e.is_capital) continue;
     const b = buckets.get((e.spent_on ?? '').slice(0, 7));
-    if (b) b.out += num(e.total_cad) * num(e.effective_business_pct) / 100;
+    if (b) b.out += round2(num(e.total_cad) * num(e.effective_business_pct) / 100) - num(e.itc_cad);
+  }
+  for (const t of must(trips)) {
+    const b = buckets.get(t.trip_on.slice(0, 7));
+    if (b) b.out += num(t.km) * num(t.rate_per_km);
   }
   return [...buckets.values()].map((b) => ({ ...b, in: round2(b.in), out: round2(b.out) }));
 }

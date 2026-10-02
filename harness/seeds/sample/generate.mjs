@@ -136,7 +136,7 @@ export async function generate({ q }) {
     P('prairie-chat', 'prairie', 'Booking Chatbot', 'done', '2026-04-06', 7200),
     P('harbourview-voice', 'harbourview', 'After-hours Voice Line', 'active', '2026-07-06', 13800),
     P('cascadia-chat', 'cascadia', 'Member Concierge Chatbot', 'active', '2026-08-10', 8500),
-    P('thompson-discovery', 'thompson', 'Automation Discovery', 'lead', '2025-02-10', 750),
+    P('thompson-discovery', 'thompson', 'Automation Discovery', 'done', '2025-02-10', 750),
     P('internal', 'riverbend', 'Ongoing support', 'active', '2025-01-01', null),
   ];
   const PR = Object.fromEntries(projects.map((p) => [p.key, p]));
@@ -537,8 +537,10 @@ export async function generate({ q }) {
   sql.push(insert('documents', docRows));
 
   sql.push(insert('tax_filings', [
-    { kind: 'gst', period_start: '2024-08-15', period_end: '2025-09-30', due_on: '2025-12-31', filed_on: '2025-12-15', confirmation: 'GST-25-4471923', amount_owing: null, paid_on: '2025-12-15', notes: 'First annual return (stub period from registration)' },
-    { kind: 't2', period_start: '2024-08-15', period_end: '2025-09-30', due_on: '2026-03-31', filed_on: '2026-03-20', confirmation: 'T2-25-0098812', amount_owing: null, paid_on: '2025-12-29', notes: 'Balance due Dec 31 (CCPC, 3 months)' },
+    { kind: 'gst', period_start: '2024-09-03', period_end: '2024-09-30', due_on: '2024-12-31', filed_on: '2024-11-28', confirmation: 'GST-24-0012877', amount_owing: 0, paid_on: null, notes: 'Short first period from GST registration (nil return)' },
+    { kind: 't2', period_start: '2024-08-15', period_end: '2024-09-30', due_on: '2025-03-31', filed_on: '2025-01-20', confirmation: 'T2-24-0044105', amount_owing: 0, paid_on: null, notes: 'Short first tax year from incorporation (start-up costs only)' },
+    { kind: 'gst', period_start: '2024-10-01', period_end: '2025-09-30', due_on: '2025-12-31', filed_on: '2025-12-15', confirmation: 'GST-25-4471923', amount_owing: null, paid_on: '2025-12-15', notes: 'First full annual return' },
+    { kind: 't2', period_start: '2024-10-01', period_end: '2025-09-30', due_on: '2026-03-31', filed_on: '2026-03-20', confirmation: 'T2-25-0098812', amount_owing: null, paid_on: '2025-12-29', notes: 'Balance due Dec 31 (CCPC, 3 months)' },
     { kind: 'gst', period_start: '2025-10-01', period_end: '2026-09-30', due_on: '2026-12-31', filed_on: null, confirmation: null, amount_owing: null, paid_on: null, notes: null },
     { kind: 't2', period_start: '2025-10-01', period_end: '2026-09-30', due_on: '2027-03-31', filed_on: null, confirmation: null, amount_owing: null, paid_on: null, notes: 'Tax balance payable by Dec 31, 2026' },
     { kind: 'other', period_start: '2025-08-15', period_end: '2026-08-15', due_on: '2026-10-15', filed_on: null, confirmation: null, amount_owing: 43.39, paid_on: null, notes: 'BC Registry annual report (within 2 months of anniversary)' },

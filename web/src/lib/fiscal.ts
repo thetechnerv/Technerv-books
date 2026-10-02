@@ -7,7 +7,8 @@ import { format } from 'date-fns';
 export function fiscalYearOf(d: Date | string, yearEnd = '09-30') {
   const v = typeof d === 'string' ? new Date(d + 'T12:00:00') : d;
   const [m, day] = yearEnd.split('-').map(Number);
-  const endThisYear = new Date(v.getFullYear(), m! - 1, day!);
+  // Compare calendar days, not instants: the year-end date itself belongs to the year it closes.
+  const endThisYear = new Date(v.getFullYear(), m! - 1, day!, 23, 59, 59, 999);
   return v > endThisYear ? v.getFullYear() + 1 : v.getFullYear();
 }
 

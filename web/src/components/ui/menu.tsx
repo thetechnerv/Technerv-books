@@ -31,7 +31,7 @@ export function Menu({ trigger, items, align = 'end', label = 'More' }: { trigge
             exit={{ opacity: 0, scale: 0.8, filter: 'blur(4px)', transition: { duration: 0.14 } }}
             transition={{ type: 'spring', bounce: 0.18, duration: 0.34 }}
             style={{ transformOrigin: align === 'end' ? 'top right' : 'top left' }}
-            className={cn('material-thick absolute top-[calc(100%+6px)] z-50 min-w-[230px] overflow-hidden rounded-[14px] py-1 shadow-pop lg:min-w-[200px] lg:rounded-[10px]', align === 'end' ? 'right-0' : 'left-0')}
+            className={cn('material-thick absolute top-[calc(100%+6px)] z-50 max-h-[min(420px,60dvh)] min-w-[230px] overflow-y-auto overscroll-contain rounded-[14px] py-1 shadow-pop lg:min-w-[200px] lg:rounded-[10px]', align === 'end' ? 'right-0' : 'left-0')}
           >
             {items.map((it, i) =>
               it === 'separator' ? (

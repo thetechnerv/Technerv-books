@@ -1,6 +1,8 @@
 'use client';
 import { createPortal } from 'react-dom';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useSyncExternalStore, type ReactNode } from 'react';
+
+const noop = () => () => {};
 import { AnimatePresence, motion, useDragControls, type PanInfo } from 'motion/react';
 import { cn } from '@/lib/cn';
 import { useIsDesktop } from '@/lib/hooks';
@@ -33,8 +35,7 @@ const SPRING_CENTER = { type: 'spring' as const, bounce: 0, duration: 0.32 };
 export function Sheet({ open, onClose, title, cancelLabel = 'Cancel', action, children, size = 'md', fit, className }: SheetProps) {
   const desktop = useIsDesktop();
   const drag = useDragControls();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(noop, () => true, () => false);
 
   useEffect(() => {
     if (!open) return;

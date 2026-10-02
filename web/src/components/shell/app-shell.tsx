@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import {
@@ -35,8 +35,11 @@ export const QUICK_ADD = [
 export function AppShell({ member, company, counts, devSession, children }: ShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const params = useSearchParams();
   const active = activeHref(pathname);
   const [quickAdd, setQuickAdd] = useState(false);
+  // Full-screen editors hide the tab bar, as iOS does for pushed task screens.
+  const editing = /\/(new|edit)$/.test(pathname) || pathname.startsWith('/banking/import') || params.get('edit') === '1';
 
   // Keyboard: N = new, ⌘K = search (search palette listens for this too)
   useEffect(() => {
@@ -52,7 +55,7 @@ export function AppShell({ member, company, counts, devSession, children }: Shel
   }, [router]);
 
   return (
-    <div className="lg:flex">
+    <div className="lg:flex" data-tabbar={editing ? 'hidden' : undefined}>
       {/* ───────── Desktop sidebar ───────── */}
       <aside className="material-sidebar sticky top-0 hidden h-dvh w-[248px] shrink-0 flex-col shadow-[inset_-0.5px_0_0_var(--separator)] lg:flex">
         <div className="flex h-[52px] items-center gap-2.5 px-4">
@@ -119,7 +122,7 @@ export function AppShell({ member, company, counts, devSession, children }: Shel
       <div className="min-w-0 flex-1">{children}</div>
 
       {/* ───────── Phone tab bar ───────── */}
-      <TabBar active={active} pathname={pathname} counts={counts} onAdd={() => setQuickAdd(true)} />
+      {!editing && <TabBar active={active} pathname={pathname} counts={counts} onAdd={() => setQuickAdd(true)} />}
       <QuickAddSheet open={quickAdd} onClose={() => setQuickAdd(false)} />
     </div>
   );
@@ -142,7 +145,7 @@ function TabBar({ active, pathname, counts, onAdd }: { active: string; pathname:
       style={{ paddingBottom: 'max(var(--safe-bottom), 10px)' }}
     >
       <div className="material-glass flex h-[var(--tabbar-h)] w-full max-w-[440px] items-center rounded-full px-1.5">
-        {tabs.map((t, i) =>
+        {tabs.map((t) =>
           t === null ? (
             <button
               key="add"

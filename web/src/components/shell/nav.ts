@@ -1,6 +1,6 @@
 import {
   House, FileText, ClipboardList, HandCoins, Users, Receipt, Repeat, Car, Landmark, Inbox, Scale,
-  Calculator, ChartColumn, FolderLock, Settings, type LucideIcon,
+  Calculator, ChartColumn, FolderLock, Settings, Wand2, type LucideIcon,
 } from 'lucide-react';
 
 export type NavItem = { href: string; label: string; icon: LucideIcon; badge?: 'review' | 'overdue'; color: string };
@@ -22,6 +22,7 @@ export const NAV: NavGroup[] = [
   { label: 'Banking', items: [
     { href: '/banking', label: 'Accounts & imports', icon: Landmark, color: '#0680A2' },
     { href: '/banking/review', label: 'Review', icon: Inbox, badge: 'review', color: '#E5A00D' },
+    { href: '/banking/rules', label: 'Rules', icon: Wand2, color: '#7C4DDB' },
   ] },
   { label: 'Owners', items: [{ href: '/balances', label: 'Owner balances', icon: Scale, color: '#05A38C' }] },
   { label: 'Tax & records', items: [

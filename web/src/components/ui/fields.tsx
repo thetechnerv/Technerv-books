@@ -1,5 +1,5 @@
 'use client';
-import { forwardRef, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { forwardRef, useEffect, useRef, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
@@ -139,17 +139,28 @@ export function AmountInput({ name, defaultValue, currency = 'CAD', onValue, aut
   );
 }
 
-/** Small pill choice chips (multi- or single-select). */
+/** Small pill choice chips. The selected chip is kept scrolled into view. */
 export function Chips<T extends string>({ options, value, onChange, className }: { options: { value: T; label: ReactNode; icon?: ReactNode }[]; value: T; onChange: (v: T) => void; className?: string }) {
+  const row = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = row.current?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    const box = row.current;
+    if (!el || !box) return;
+    const left = el.offsetLeft - box.offsetLeft;
+    if (left < box.scrollLeft || left + el.offsetWidth > box.scrollLeft + box.clientWidth) {
+      box.scrollTo({ left: Math.max(0, left - 16), behavior: 'smooth' });
+    }
+  }, [value]);
   return (
-    <div className={cn('no-scrollbar flex gap-2 overflow-x-auto', className)}>
+    <div ref={row} className={cn('no-scrollbar flex gap-2 overflow-x-auto', className)}>
       {options.map((o) => (
         <button
           type="button"
           key={o.value}
+          aria-pressed={o.value === value}
           onClick={() => onChange(o.value)}
           className={cn('pressable inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-subhead font-medium transition-colors lg:h-7 lg:px-3 lg:text-footnote',
-            o.value === value ? 'bg-label text-bg' : 'bg-cell text-label shadow-card')}
+            o.value === value ? 'bg-label text-bg' : 'bg-fill text-label hover:bg-fill-3')}
         >
           {o.icon}{o.label}
         </button>

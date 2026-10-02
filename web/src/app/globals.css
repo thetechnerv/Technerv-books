@@ -260,85 +260,95 @@
 }
 
 /* ───────── Base ───────── */
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-body {
-  background: var(--bg);
-  color: var(--label);
-  font-family: var(--font-sans);
-  font-size: var(--fs-body);
-  line-height: var(--lh-body);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-optical-sizing: auto;
-  -webkit-tap-highlight-color: transparent;
-  overscroll-behavior-y: none;
+@layer base {
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--label);
+    font-family: var(--font-sans);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-optical-sizing: auto;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  ::selection { background: var(--accent-soft); }
+  /* Focus ring in brand colour, only for keyboard users */
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  input, textarea, select { font: inherit; color: inherit; }
+  input::placeholder, textarea::placeholder { color: var(--label-3); }
+  input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; }
+  input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 }
-::selection { background: var(--accent-soft); }
 
 /* Display sizes are tracked tighter; small text slightly looser. */
-.text-large, .text-title1 { letter-spacing: -0.022em; font-family: var(--font-display); }
-.text-title2, .text-title3 { letter-spacing: -0.016em; font-family: var(--font-display); }
-.text-headline, .text-body { letter-spacing: -0.008em; }
-.text-footnote, .text-caption, .text-caption2 { letter-spacing: 0.002em; }
+@layer components {
+  .text-large, .text-title1 { letter-spacing: -0.022em; font-family: var(--font-display); }
+  .text-title2, .text-title3 { letter-spacing: -0.016em; font-family: var(--font-display); }
+  .text-headline, .text-body { letter-spacing: -0.008em; }
+  .text-footnote, .text-caption, .text-caption2 { letter-spacing: 0.002em; }
+}
 
-.tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1, "cv11" 1; }
+@utility tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1, "cv11" 1; }
 
 /* Materials */
-.material-bar {
+@utility material-bar {
   background: var(--material-bar);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
 }
-.material-thick {
+@utility material-thick {
   background: var(--material-thick);
   -webkit-backdrop-filter: saturate(180%) blur(30px);
   backdrop-filter: saturate(180%) blur(30px);
 }
-.material-glass {
+@utility material-glass {
   background: var(--material-glass);
   -webkit-backdrop-filter: saturate(200%) blur(24px);
   backdrop-filter: saturate(200%) blur(24px);
   box-shadow: var(--shadow-bar), inset 0 0.5px 0 var(--material-edge);
 }
-.material-sidebar {
+@utility material-sidebar {
   background: var(--bg-sidebar);
   -webkit-backdrop-filter: saturate(180%) blur(40px);
   backdrop-filter: saturate(180%) blur(40px);
 }
 
 /* Hairlines that stay 0.5px on retina screens */
-.hairline-b { box-shadow: inset 0 -0.5px 0 var(--separator); }
-.hairline-t { box-shadow: inset 0 0.5px 0 var(--separator); }
+@utility hairline-b { box-shadow: inset 0 -0.5px 0 var(--separator); }
+@utility hairline-t { box-shadow: inset 0 0.5px 0 var(--separator); }
 
 /* Grouped list rows: inset separator that starts after the leading icon */
-.group-rows > * + * { position: relative; }
-.group-rows > * + *::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: var(--row-inset, 16px);
-  height: 0.5px;
-  background: var(--separator);
-  pointer-events: none;
+@utility group-rows {
+  & > * + * { position: relative; }
+  & > * + *::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: var(--row-inset, 16px);
+    height: 0.5px;
+    background: var(--separator);
+    pointer-events: none;
+  }
 }
 
 /* Press feedback — instant on pointer-down */
-.pressable { transition: transform 120ms ease-out, background-color 120ms ease-out, opacity 120ms ease-out; }
-.pressable:active { transform: scale(0.97); }
-.row-press:active { background-color: var(--fill-2); }
+@utility pressable {
+  transition: transform 120ms ease-out, background-color 120ms ease-out, opacity 120ms ease-out;
+  &:active { transform: scale(0.97); }
+}
+@utility row-press { &:active { background-color: var(--fill-2); } }
 
-/* Focus ring in brand colour, only for keyboard users */
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
 
-/* Native inputs blended into rows */
-input, textarea, select { font: inherit; color: inherit; }
-input::placeholder, textarea::placeholder { color: var(--label-3); }
-input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; }
-input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { scrollbar-width: none; }
+/* Editor screens hide the tab bar; bars that sit above it drop to the bottom. */
+:root:has([data-tabbar="hidden"]) { --tabbar-h: -10px; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 120ms !important; }

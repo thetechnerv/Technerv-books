@@ -2,6 +2,7 @@ import { Page } from '@/components/ui/page';
 import { Section, Row, IconTile } from '@/components/ui/group';
 import { NAV } from '@/components/shell/nav';
 import { db } from '@/lib/db';
+import { SearchField } from '@/components/shell/search-field';
 
 export const metadata = { title: 'More' };
 
@@ -12,6 +13,7 @@ export default async function More() {
   const groups = NAV.map((g) => ({ ...g, items: g.items.filter((i) => !['/', '/invoices', '/expenses'].includes(i.href)) })).filter((g) => g.items.length);
   return (
     <Page title="More">
+      <SearchField />
       {groups.map((g, i) => (
         <Section key={i} title={g.label ?? undefined} inset={58}>
           {g.items.map((it) => (

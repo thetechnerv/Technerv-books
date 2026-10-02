@@ -57,7 +57,9 @@ export function pct(n: number | string | null | undefined, digits = 0) { return 
 export function plural(n: number, one: string, many = one + 's') { return `${n} ${n === 1 ? one : many}`; }
 
 export function initials(name: string) {
-  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join('');
+  // Skip connectors like "&", "and", "of" so "Maple & Main" → "MM".
+  const words = name.split(/\s+/).filter((w) => /^[\p{L}\p{N}]/u.test(w) && !/^(and|of|the)$/i.test(w));
+  return words.slice(0, 2).map((p) => p[0]!.toUpperCase()).join('');
 }
 
 export function bytes(n: number | null | undefined) {

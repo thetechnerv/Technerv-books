@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import {
   AlertTriangle, Inbox, ReceiptText, Scale, FileClock, CalendarClock, FileText, Receipt, HandCoins, Upload, ArrowLeftRight, ChevronRight, Landmark,
 } from 'lucide-react';
@@ -8,6 +8,7 @@ import { Section, Row, IconTile, Card } from '@/components/ui/group';
 import { BigMoney, Money } from '@/components/ui/money';
 import { Avatar } from '@/components/ui/avatar';
 import { BarChart } from '@/components/charts/bar-chart';
+import { SearchButton } from '@/components/shell/search-palette';
 import { db, must } from '@/lib/db';
 import { currentMember, businessProfile, allMembers } from '@/lib/session';
 import { cashPositions, receivables, gstForFiscalYear, monthlySeries } from '@/lib/finance';
@@ -29,7 +30,7 @@ export default async function Home() {
     monthlySeries(12),
     supabase.from('member_balances').select('*'),
     supabase.from('bank_transactions').select('id', { count: 'exact', head: true }).eq('status', 'unreviewed'),
-    supabase.from('expense_overview').select('id', { count: 'exact', head: true }).eq('attachment_count', 0).neq('nature', 'personal').gte('spent_on', format(new Date(Date.now() - 120 * 864e5), 'yyyy-MM-dd')),
+    supabase.from('expense_overview').select('id', { count: 'exact', head: true }).eq('attachment_count', 0).neq('nature', 'personal').gte('spent_on', format(subDays(new Date(), 120), 'yyyy-MM-dd')),
     supabase.from('invoices').select('id', { count: 'exact', head: true }).eq('status', 'draft'),
     supabase.from('invoices').select('id', { count: 'exact', head: true }).eq('kind', 'estimate').eq('status', 'sent'),
     supabase.from('tax_filings').select('*').is('filed_on', null).order('due_on').limit(4),
@@ -48,18 +49,32 @@ export default async function Home() {
 
   const attention = [
     ar.overdueCount > 0 && { href: '/invoices?filter=overdue', icon: AlertTriangle, color: '#E0352B', title: `${plural(ar.overdueCount, 'invoice')} overdue`, value: money(ar.overdue) },
-    (review.count ?? 0) > 0 && { href: '/banking/review', icon: Inbox, color: '#E5A00D', title: `${plural(review.count ?? 0, 'transaction')} to review`, value: 'From latest import' },
-    (missing.count ?? 0) > 0 && { href: '/expenses?filter=no-receipt', icon: ReceiptText, color: '#E8833A', title: `${plural(missing.count ?? 0, 'receipt')} missing`, value: 'Last 4 months' },
+    (review.count ?? 0) > 0 && { href: '/banking/review', icon: Inbox, color: '#E5A00D', title: `${plural(review.count ?? 0, 'transaction')} to review`, sub: 'From the latest bank and card imports', value: '' },
+    (missing.count ?? 0) > 0 && { href: '/expenses?filter=no-receipt', icon: ReceiptText, color: '#E8833A', title: `${plural(missing.count ?? 0, 'receipt')} missing`, sub: 'Business expenses in the last 4 months', value: '' },
     (drafts.count ?? 0) > 0 && { href: '/invoices?filter=draft', icon: FileClock, color: '#6B7B80', title: `${plural(drafts.count ?? 0, 'draft')} not sent yet`, value: '' },
     (estimates.count ?? 0) > 0 && { href: '/estimates?filter=sent', icon: FileText, color: '#7C4DDB', title: `${plural(estimates.count ?? 0, 'estimate')} awaiting reply`, value: '' },
-    owedToMembers > 0 && { href: '/balances', icon: Scale, color: '#05A38C', title: 'Owners to reimburse', value: money(owedToMembers) },
-  ].filter(Boolean) as { href: string; icon: typeof AlertTriangle; color: string; title: string; value: string }[];
+    owedToMembers > 0 && { href: '/balances', icon: Scale, color: '#05A38C', title: 'Owners to reimburse', sub: 'Out-of-pocket spending and start-up loans', value: money(owedToMembers, 'CAD', { cents: false }) },
+  ].filter(Boolean) as { href: string; icon: typeof AlertTriangle; color: string; title: string; sub?: string; value: string }[];
+
+  const attentionList = (
+        <Section title="Needs attention" inset={58}>
+            {attention.length === 0 && <div className="px-4 py-6 text-center text-subhead text-label-2">All caught up.</div>}
+            {attention.map((a) => (
+              <Row key={a.href} href={a.href} icon={<IconTile color={a.color}><a.icon strokeWidth={2.2} /></IconTile>} title={a.title} subtitle={a.sub} value={a.value || undefined} />
+            ))}
+        </Section>
+  );
 
   return (
     <Page
       title={`${greeting}, ${me.full_name.split(' ')[0]}`}
       subtitle={format(new Date(), 'EEEE, MMMM d')}
-      actions={<Link href="/settings" className="lg:hidden"><Avatar name={me.full_name} color={me.color} initials={me.initials} size={32} /></Link>}
+      actions={
+        <>
+          <SearchButton compact className="lg:hidden" />
+          <Link href="/settings" className="lg:hidden"><Avatar name={me.full_name} color={me.color} initials={me.initials} size={32} /></Link>
+        </>
+      }
     >
       {/* Headline numbers */}
       <div className="-mx-4 mb-7 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 no-scrollbar lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0">
@@ -97,6 +112,8 @@ export default async function Home() {
         </StatCard>
       </div>
 
+      <div className="lg:hidden">{attentionList}</div>
+
       <div className="lg:grid lg:grid-cols-[1.45fr_1fr] lg:gap-6">
         <div>
           <Section title="Last 12 months" action={<Link href="/reports" className="text-footnote font-medium text-accent-text">Reports</Link>}>
@@ -132,7 +149,8 @@ export default async function Home() {
                   key={a.id}
                   href={meta.href(a.entity_id)}
                   icon={m ? <Avatar name={m.full_name} color={m.color} initials={m.initials} size={30} /> : <IconTile color="var(--fill-3)" fg="var(--label-2)"><Upload /></IconTile>}
-                  title={<><span className="font-medium">{m?.full_name.split(' ')[0] ?? 'System'}</span> <span className="text-label-2">{verb(a.action, a.entity_type)}</span> {a.summary}</>}
+                  title={<><span className="font-medium">{m?.full_name.split(' ')[0] ?? 'System'}</span> <span className="text-label-2">{verb(a.action, a.entity_type)}</span></>}
+                  subtitle={a.summary}
                   value={relativeDay(a.created_at)}
                 />
               );
@@ -141,12 +159,7 @@ export default async function Home() {
         </div>
 
         <div>
-          <Section title="Needs attention" inset={58}>
-            {attention.length === 0 && <div className="px-4 py-6 text-center text-subhead text-label-2">All caught up.</div>}
-            {attention.map((a) => (
-              <Row key={a.href} href={a.href} icon={<IconTile color={a.color}><a.icon strokeWidth={2.2} /></IconTile>} title={a.title} value={a.value} />
-            ))}
-          </Section>
+          <div className="hidden lg:block">{attentionList}</div>
 
           <Section title="Upcoming deadlines" inset={58} action={<Link href="/tax" className="text-footnote font-medium text-accent-text">Tax Centre</Link>}>
             {must(filings).map((f) => {

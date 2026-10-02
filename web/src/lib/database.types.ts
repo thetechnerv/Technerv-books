@@ -120,6 +120,7 @@ export type Database = {
         Row: {
           account_id: string
           amount: number
+          auto_matched: boolean
           balance_after: number | null
           created_at: string
           dedupe_hash: string
@@ -131,13 +132,18 @@ export type Database = {
           matched_income_id: string | null
           matched_payment_id: string | null
           matched_transfer_id: string | null
+          note: string | null
           posted_on: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          rule_id: string | null
           source: string
           status: Database["accounts"]["Enums"]["bank_txn_status"]
         }
         Insert: {
           account_id: string
           amount: number
+          auto_matched?: boolean
           balance_after?: number | null
           created_at?: string
           dedupe_hash: string
@@ -149,13 +155,18 @@ export type Database = {
           matched_income_id?: string | null
           matched_payment_id?: string | null
           matched_transfer_id?: string | null
+          note?: string | null
           posted_on: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          rule_id?: string | null
           source?: string
           status?: Database["accounts"]["Enums"]["bank_txn_status"]
         }
         Update: {
           account_id?: string
           amount?: number
+          auto_matched?: boolean
           balance_after?: number | null
           created_at?: string
           dedupe_hash?: string
@@ -167,7 +178,11 @@ export type Database = {
           matched_income_id?: string | null
           matched_payment_id?: string | null
           matched_transfer_id?: string | null
+          note?: string | null
           posted_on?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          rule_id?: string | null
           source?: string
           status?: Database["accounts"]["Enums"]["bank_txn_status"]
         }
@@ -215,6 +230,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "bank_transactions_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "member_balances"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "bank_transactions_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transactions_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "rules"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "bank_txn_batch_fk"
             columns: ["import_batch"]
             isOneToOne: false
@@ -233,6 +269,7 @@ export type Database = {
           business_number: string | null
           city: string | null
           country: string
+          credit_note_prefix: string
           default_tax_code: string
           default_terms_days: number
           email: string | null
@@ -279,6 +316,7 @@ export type Database = {
           business_number?: string | null
           city?: string | null
           country?: string
+          credit_note_prefix?: string
           default_tax_code?: string
           default_terms_days?: number
           email?: string | null
@@ -325,6 +363,7 @@ export type Database = {
           business_number?: string | null
           city?: string | null
           country?: string
+          credit_note_prefix?: string
           default_tax_code?: string
           default_terms_days?: number
           email?: string | null
@@ -482,6 +521,7 @@ export type Database = {
       }
       documents: {
         Row: {
+          account_id: string | null
           created_at: string
           doc_type: string
           expires_on: string | null
@@ -489,9 +529,13 @@ export type Database = {
           id: string
           issued_on: string | null
           notes: string | null
+          period_end: string | null
+          period_start: string | null
           title: string
+          updated_at: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           doc_type: string
           expires_on?: string | null
@@ -499,9 +543,13 @@ export type Database = {
           id?: string
           issued_on?: string | null
           notes?: string | null
+          period_end?: string | null
+          period_start?: string | null
           title: string
+          updated_at?: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           doc_type?: string
           expires_on?: string | null
@@ -509,9 +557,20 @@ export type Database = {
           id?: string
           issued_on?: string | null
           notes?: string | null
+          period_end?: string | null
+          period_start?: string | null
           title?: string
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "documents_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "money_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       expenses: {
         Row: {
@@ -535,6 +594,7 @@ export type Database = {
           recurring_expense_id: string | null
           settled: boolean
           settled_on: string | null
+          settlement_transfer_id: string | null
           source: string
           spent_by: string
           spent_on: string
@@ -566,6 +626,7 @@ export type Database = {
           recurring_expense_id?: string | null
           settled?: boolean
           settled_on?: string | null
+          settlement_transfer_id?: string | null
           source?: string
           spent_by: string
           spent_on?: string
@@ -597,6 +658,7 @@ export type Database = {
           recurring_expense_id?: string | null
           settled?: boolean
           settled_on?: string | null
+          settlement_transfer_id?: string | null
           source?: string
           spent_by?: string
           spent_on?: string
@@ -672,6 +734,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "expenses_settlement_transfer_id_fkey"
+            columns: ["settlement_transfer_id"]
+            isOneToOne: false
+            referencedRelation: "member_transfers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "expenses_spent_by_fkey"
             columns: ["spent_by"]
             isOneToOne: false
@@ -714,11 +783,14 @@ export type Database = {
           created_at: string
           date_from: string | null
           date_to: string | null
+          file_format: string | null
           file_name: string
+          file_path: string | null
           id: string
           imported_by: string | null
           rows_duplicate: number
           rows_imported: number
+          rows_matched: number
           rows_total: number
         }
         Insert: {
@@ -726,11 +798,14 @@ export type Database = {
           created_at?: string
           date_from?: string | null
           date_to?: string | null
+          file_format?: string | null
           file_name: string
+          file_path?: string | null
           id?: string
           imported_by?: string | null
           rows_duplicate?: number
           rows_imported?: number
+          rows_matched?: number
           rows_total?: number
         }
         Update: {
@@ -738,11 +813,14 @@ export type Database = {
           created_at?: string
           date_from?: string | null
           date_to?: string | null
+          file_format?: string | null
           file_name?: string
+          file_path?: string | null
           id?: string
           imported_by?: string | null
           rows_duplicate?: number
           rows_imported?: number
+          rows_matched?: number
           rows_total?: number
         }
         Relationships: [
@@ -773,6 +851,7 @@ export type Database = {
         Row: {
           amount: number | null
           description: string
+          detail: string | null
           id: string
           invoice_id: string
           item_id: string | null
@@ -785,6 +864,7 @@ export type Database = {
         Insert: {
           amount?: number | null
           description: string
+          detail?: string | null
           id?: string
           invoice_id: string
           item_id?: string | null
@@ -797,6 +877,7 @@ export type Database = {
         Update: {
           amount?: number | null
           description?: string
+          detail?: string | null
           id?: string
           invoice_id?: string
           item_id?: string | null
@@ -1039,6 +1120,13 @@ export type Database = {
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "invoices_recurring_fk"
+            columns: ["recurring_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_invoices"
+            referencedColumns: ["id"]
+          },
         ]
       }
       items: {
@@ -1198,6 +1286,9 @@ export type Database = {
           purpose: string
           rate_per_km: number
           reimbursed: boolean
+          reimbursed_on: string | null
+          round_trip: boolean
+          settlement_transfer_id: string | null
           trip_on: string
         }
         Insert: {
@@ -1211,6 +1302,9 @@ export type Database = {
           purpose: string
           rate_per_km: number
           reimbursed?: boolean
+          reimbursed_on?: string | null
+          round_trip?: boolean
+          settlement_transfer_id?: string | null
           trip_on?: string
         }
         Update: {
@@ -1224,6 +1318,9 @@ export type Database = {
           purpose?: string
           rate_per_km?: number
           reimbursed?: boolean
+          reimbursed_on?: string | null
+          round_trip?: boolean
+          settlement_transfer_id?: string | null
           trip_on?: string
         }
         Relationships: [
@@ -1246,6 +1343,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mileage_trips_settlement_transfer_id_fkey"
+            columns: ["settlement_transfer_id"]
+            isOneToOne: false
+            referencedRelation: "member_transfers"
             referencedColumns: ["id"]
           },
         ]
@@ -1564,6 +1668,61 @@ export type Database = {
           },
         ]
       }
+      reconciliations: {
+        Row: {
+          account_id: string
+          computed_balance: number
+          id: string
+          notes: string | null
+          period_end: string
+          reconciled_at: string
+          reconciled_by: string | null
+          statement_balance: number
+        }
+        Insert: {
+          account_id: string
+          computed_balance: number
+          id?: string
+          notes?: string | null
+          period_end: string
+          reconciled_at?: string
+          reconciled_by?: string | null
+          statement_balance: number
+        }
+        Update: {
+          account_id?: string
+          computed_balance?: number
+          id?: string
+          notes?: string | null
+          period_end?: string
+          reconciled_at?: string
+          reconciled_by?: string | null
+          statement_balance?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reconciliations_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "money_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reconciliations_reconciled_by_fkey"
+            columns: ["reconciled_by"]
+            isOneToOne: false
+            referencedRelation: "member_balances"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "reconciliations_reconciled_by_fkey"
+            columns: ["reconciled_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recurring_expenses: {
         Row: {
           active: boolean
@@ -1578,7 +1737,10 @@ export type Database = {
           id: string
           nature: Database["accounts"]["Enums"]["expense_nature"]
           next_on: string
+          notes: string | null
           paid_from_account_id: string
+          project_id: string | null
+          pst: number
           spent_by: string
           vendor: string
         }
@@ -1595,7 +1757,10 @@ export type Database = {
           id?: string
           nature?: Database["accounts"]["Enums"]["expense_nature"]
           next_on: string
+          notes?: string | null
           paid_from_account_id: string
+          project_id?: string | null
+          pst?: number
           spent_by: string
           vendor: string
         }
@@ -1612,7 +1777,10 @@ export type Database = {
           id?: string
           nature?: Database["accounts"]["Enums"]["expense_nature"]
           next_on?: string
+          notes?: string | null
           paid_from_account_id?: string
+          project_id?: string | null
+          pst?: number
           spent_by?: string
           vendor?: string
         }
@@ -1629,6 +1797,13 @@ export type Database = {
             columns: ["paid_from_account_id"]
             isOneToOne: false
             referencedRelation: "money_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_expenses_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
@@ -1770,7 +1945,10 @@ export type Database = {
         Row: {
           amount_owing: number | null
           confirmation: string | null
+          created_at: string
+          document_id: string | null
           due_on: string | null
+          filed_by: string | null
           filed_on: string | null
           id: string
           kind: string
@@ -1778,11 +1956,15 @@ export type Database = {
           paid_on: string | null
           period_end: string
           period_start: string
+          worksheet: Json
         }
         Insert: {
           amount_owing?: number | null
           confirmation?: string | null
+          created_at?: string
+          document_id?: string | null
           due_on?: string | null
+          filed_by?: string | null
           filed_on?: string | null
           id?: string
           kind: string
@@ -1790,11 +1972,15 @@ export type Database = {
           paid_on?: string | null
           period_end: string
           period_start: string
+          worksheet?: Json
         }
         Update: {
           amount_owing?: number | null
           confirmation?: string | null
+          created_at?: string
+          document_id?: string | null
           due_on?: string | null
+          filed_by?: string | null
           filed_on?: string | null
           id?: string
           kind?: string
@@ -1802,8 +1988,31 @@ export type Database = {
           paid_on?: string | null
           period_end?: string
           period_start?: string
+          worksheet?: Json
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tax_filings_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tax_filings_filed_by_fkey"
+            columns: ["filed_by"]
+            isOneToOne: false
+            referencedRelation: "member_balances"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "tax_filings_filed_by_fkey"
+            columns: ["filed_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tax_rates: {
         Row: {
@@ -2053,6 +2262,13 @@ export type Database = {
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "invoices_recurring_fk"
+            columns: ["recurring_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_invoices"
+            referencedColumns: ["id"]
+          },
         ]
       }
       member_balances: {
@@ -2063,17 +2279,73 @@ export type Database = {
         }
         Relationships: []
       }
+      member_ledger: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          detail: string | null
+          entity_id: string | null
+          entry_type: string | null
+          kind: string | null
+          label: string | null
+          member_id: string | null
+          occurred_on: string | null
+          repay_by: string | null
+          settled: boolean | null
+          settled_on: string | null
+          settlement_transfer_id: string | null
+          total_cad: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      account_balance_at: {
+        Args: { p_account: string; p_on: string }
+        Returns: number
+      }
+      apply_rules_to_unreviewed: {
+        Args: { p_account?: string }
+        Returns: number
+      }
+      bank_dedupe_hash: {
+        Args: {
+          p_account: string
+          p_amount: number
+          p_description: string
+          p_on: string
+        }
+        Returns: string
+      }
+      best_rule: { Args: { p_description: string }; Returns: string }
       current_member_id: { Args: never; Returns: string }
+      export_tables: { Args: never; Returns: string[] }
+      fiscal_year_end_on: { Args: { p_on: string }; Returns: string }
+      invoice_snapshot: { Args: { p_invoice: string }; Returns: Json }
       is_member: { Args: never; Returns: boolean }
+      mileage_rate_for: {
+        Args: {
+          p_exclude?: string
+          p_km: number
+          p_member: string
+          p_trip_on: string
+        }
+        Returns: number
+      }
       next_document_number: {
         Args: { p_kind: Database["accounts"]["Enums"]["invoice_kind"] }
         Returns: string
       }
+      normalise_bank_description: { Args: { p: string }; Returns: string }
       public_invoice: { Args: { p_token: string }; Returns: Json }
       recalc_invoice: { Args: { p_invoice: string }; Returns: undefined }
       recalc_invoice_paid: { Args: { p_invoice: string }; Returns: undefined }
+      replace_invoice_lines: {
+        Args: { p_invoice: string; p_lines: Json }
+        Returns: undefined
+      }
+      shareholder_loan_repay_by: { Args: { p_on: string }; Returns: string }
+      undo_import: { Args: { p_batch: string }; Returns: Json }
     }
     Enums: {
       bank_txn_status: "unreviewed" | "matched" | "created" | "ignored"
