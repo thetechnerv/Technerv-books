@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How to use Tech Nerv Accounts</title>
+<meta name="color-scheme" content="light dark">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f2f4f5; --cell: #ffffff; --inset: #f7f9f9; --fill: rgba(118,132,136,.12); --fill2: rgba(118,132,136,.08);
+    --label: #0c1113; --label2: rgba(23,34,37,.62); --label3: rgba(23,34,37,.38);
+    --sep: rgba(12,17,19,.1); --accent: #03ddaa; --on-accent: #032920; --accent-text: #00866a; --accent-soft: rgba(3,221,170,.14);
+    --blue: #0478a0; --blue-soft: rgba(6,128,162,.12); --red: #e0352b; --red-soft: rgba(224,53,43,.1);
+    --orange: #d97706; --orange-soft: rgba(245,158,11,.14); --purple: #7c4ddb; --purple-soft: rgba(124,77,219,.12);
+    --bar: rgba(248,250,250,.78); --shadow: 0 1px 2px rgba(12,17,19,.04), 0 0 0 .5px rgba(12,17,19,.05);
+    --r: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #070b0c; --cell: #111a1c; --inset: #0c1416; --fill: rgba(150,175,180,.16); --fill2: rgba(150,175,180,.1);
+      --label: #f5f8f9; --label2: rgba(222,236,239,.64); --label3: rgba(222,236,239,.36);
+      --sep: rgba(222,236,239,.1); --accent-text: #2ee6b8; --accent-soft: rgba(3,221,170,.16);
+      --blue: #43b8dc; --blue-soft: rgba(67,184,220,.16); --red: #ff6159; --red-soft: rgba(255,97,89,.16);
+      --orange: #ffb340; --orange-soft: rgba(255,179,64,.16); --purple: #a98bff; --purple-soft: rgba(169,139,255,.16);
+      --bar: rgba(10,16,18,.72); --shadow: 0 0 0 .5px rgba(222,236,239,.06);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scroll-padding-top: 72px; }
+  body { margin: 0; background: var(--bg); color: var(--label);
+    font: 17px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent-text); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1, h2, h3 { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, system-ui, sans-serif; }
+  h1 { font-size: 40px; line-height: 1.08; letter-spacing: -.028em; margin: 0 0 12px; }
+  h2 { font-size: 28px; line-height: 1.15; letter-spacing: -.022em; margin: 0 0 6px; }
+  h3 { font-size: 19px; letter-spacing: -.012em; margin: 26px 0 8px; }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--label2); }
+  .small { font-size: 14px; }
+  kbd { font: 600 12px/1 -apple-system, Inter, system-ui, sans-serif; padding: 3px 6px; border-radius: 6px; background: var(--fill); color: var(--label); }
+
+  /* Top bar */
+  .topbar { position: sticky; top: 0; z-index: 10; padding-top: env(safe-area-inset-top, 0px);
+    background: var(--bar); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+    box-shadow: inset 0 -.5px 0 var(--sep); }
+  .topbar .in { max-width: 1180px; margin: 0 auto; height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 20px; }
+  .topbar b { font-size: 15px; }
+  .topbar .sub { font-size: 13px; color: var(--label2); }
+  .logo { width: 26px; height: 26px; border-radius: 7px; background: var(--accent); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+
+  /* Layout */
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 80px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  @media (min-width: 1000px) { .wrap { grid-template-columns: 240px minmax(0, 1fr); gap: 48px; padding-top: 40px; } }
+  nav.toc { display: none; }
+  @media (min-width: 1000px) {
+    nav.toc { display: block; position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 96px); overflow: auto; font-size: 14px; }
+    nav.toc a { display: block; padding: 5px 10px; border-radius: 7px; color: var(--label); }
+    nav.toc a:hover { background: var(--fill2); text-decoration: none; }
+    nav.toc .grp { font-size: 12px; font-weight: 600; color: var(--label3); padding: 14px 10px 4px; }
+  }
+  .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -20px 8px; padding: 0 20px 4px; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips a { flex: none; padding: 7px 13px; border-radius: 999px; background: var(--cell); box-shadow: var(--shadow); color: var(--label); font-size: 14px; font-weight: 500; }
+  @media (min-width: 1000px) { .chips { display: none; } }
+
+  section { margin: 0 0 56px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-text); margin-bottom: 6px; }
+  .lede { font-size: 19px; color: var(--label2); max-width: 720px; }
+
+  /* Cards & grouped lists */
+  .card { background: var(--cell); border-radius: var(--r); box-shadow: var(--shadow); padding: 18px; }
+  .grid { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 640px) { .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .group { background: var(--cell); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; margin: 10px 0 8px; }
+  .group .row { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; position: relative; }
+  .group .row + .row::before { content: ""; position: absolute; top: 0; right: 0; left: 58px; height: .5px; background: var(--sep); }
+  .group .row.noicon + .row::before, .group .row.noicon::before { left: 16px; }
+  .tile { width: 30px; height: 30px; border-radius: 8px; flex: none; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 700; }
+  .row .t { font-weight: 600; }
+  .row .s { color: var(--label2); font-size: 15px; margin-top: 1px; }
+  .row .k { margin-left: auto; color: var(--label3); font-size: 14px; white-space: nowrap; padding-left: 8px; }
+  .hdr { font-size: 13px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; color: var(--label2); margin: 22px 4px 0; }
+
+  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 10px 0; }
+  ol.steps li { counter-increment: s; position: relative; padding: 0 0 14px 44px; }
+  ol.steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-text); font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  ol.steps li b { display: block; }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; vertical-align: 1px; }
+  .b-accent { background: var(--accent-soft); color: var(--accent-text); }
+  .b-blue { background: var(--blue-soft); color: var(--blue); }
+  .b-red { background: var(--red-soft); color: var(--red); }
+  .b-orange { background: var(--orange-soft); color: var(--orange); }
+  .b-purple { background: var(--purple-soft); color: var(--purple); }
+  .b-gray { background: var(--fill); color: var(--label2); }
+
+  .callout { border-radius: 14px; padding: 14px 16px; margin: 14px 0; font-size: 15px; }
+  .callout.tip { background: var(--accent-soft); }
+  .callout.warn { background: var(--orange-soft); }
+  .callout.info { background: var(--blue-soft); }
+  .callout b { display: block; margin-bottom: 2px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .tablewrap { overflow-x: auto; background: var(--cell); border-radius: var(--r); box-shadow: var(--shadow); margin: 10px 0; }
+  th, td { text-align: left; padding: 10px 14px; vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--label2); font-weight: 600; background: var(--inset); }
+  tr + tr td { border-top: .5px solid var(--sep); }
+
+  .timeline { position: relative; margin: 14px 0 0; }
+  .when { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  @media (min-width: 760px) { .when { grid-template-columns: 170px minmax(0, 1fr); } }
+  .when .lbl { font-weight: 700; font-size: 15px; padding-top: 18px; }
+  .when .lbl span { display: block; font-weight: 500; color: var(--label2); font-size: 13px; }
+
+  .hero { display: grid; gap: 22px; grid-template-columns: minmax(0, 1fr); align-items: center; margin-bottom: 56px; }
+  @media (min-width: 800px) { .hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); } }
+  .phone { justify-self: center; width: 230px; height: 460px; border-radius: 40px; background: var(--cell); box-shadow: 0 30px 60px -20px rgba(0,0,0,.35), 0 0 0 8px var(--fill), var(--shadow);
+    padding: 22px 14px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
+  .phone .bigt { font-weight: 800; font-size: 22px; letter-spacing: -.02em; margin: 14px 4px 2px; }
+  .phone .mini { background: var(--bg); border-radius: 12px; padding: 10px 12px; font-size: 12px; }
+  .phone .mini b { display: block; font-size: 18px; letter-spacing: -.02em; }
+  .phone .tabbar { position: absolute; left: 12px; right: 12px; bottom: 14px; height: 52px; border-radius: 999px; background: var(--bar); box-shadow: var(--shadow);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-around; font-size: 10px; color: var(--label2); }
+  .phone .plus { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-size: 28px; line-height: 40px; text-align: center; font-weight: 400; }
+  .faq details { background: var(--cell); border-radius: 14px; box-shadow: var(--shadow); padding: 0 16px; margin: 8px 0; }
+  .faq summary { cursor: pointer; padding: 14px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; color: var(--label3); font-weight: 400; font-size: 22px; line-height: 1; }
+  .faq details[open] summary::after { content: "–"; }
+  .faq details p { color: var(--label2); font-size: 15px; padding-bottom: 14px; margin: 0; }
+  footer { text-align: center; color: var(--label3); font-size: 13px; padding: 20px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="in">
+    <span class="logo"><svg width="16" height="14" viewBox="0 0 652 576" aria-hidden="true"><g transform="translate(0 576) scale(0.1 -0.1)" fill="#0C1113"><path d="M680 5228 c0 -2 -1 -360 -3 -795 -2 -653 0 -794 11 -798 50 -19 302 14 447 58 269 83 477 210 691 422 98 97 229 281 269 375 10 25 24 52 30 60 6 8 24 49 39 90 16 41 34 91 42 110 31 82 84 428 71 463 -6 16 -70 17 -802 17 -437 0 -795 -1 -795 -2z M3615 5209 c-234 -39 -443 -122 -645 -255 -143 -94 -315 -265 -418 -416 -40 -59 -72 -109 -72 -112 0 -3 -13 -27 -28 -53 -61 -103 -121 -273 -155 -433 l-22 -105 0 -1695 0 -1695 42 -3 c23 -2 97 4 164 13 202 26 324 64 519 162 327 164 595 449 734 778 21 50 42 98 47 107 10 20 20 59 57 213 l26 110 3 880 c2 484 5 890 8 903 l5 22 790 0 790 0 5 23 c9 35 1 1551 -8 1565 -6 9 -191 12 -870 11 -789 -1 -871 -3 -972 -20z"/></g></svg></span>
+    <div><b>Tech Nerv Accounts</b> <span class="sub">· How to use the app</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Contents">
+    <div class="grp">Start</div>
+    <a href="#welcome">Welcome</a>
+    <a href="#install">Install on your phone</a>
+    <a href="#tour">A quick tour</a>
+    <div class="grp">Your routine</div>
+    <a href="#rhythm">Day-to-day rhythm</a>
+    <a href="#golden">The golden rules</a>
+    <div class="grp">How to</div>
+    <a href="#expense">Add an expense</a>
+    <a href="#personal">Business, personal or mixed</a>
+    <a href="#invoice">Create & send an invoice</a>
+    <a href="#estimate">Estimates → invoices</a>
+    <a href="#payment">Record a payment</a>
+    <a href="#bank">Import & review the bank</a>
+    <a href="#settle">Settle up between owners</a>
+    <a href="#mileage">Log a trip</a>
+    <a href="#subs">Subscriptions</a>
+    <a href="#docs">Keep documents</a>
+    <a href="#gst">File the GST/HST return</a>
+    <a href="#yearend">Year-end for the accountant</a>
+    <div class="grp">Reference</div>
+    <a href="#screens">Every screen & option</a>
+    <a href="#settings">Settings you can tweak</a>
+    <a href="#shortcuts">Shortcuts & tricks</a>
+    <a href="#glossary">Glossary</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <main>
+    <div class="chips" aria-label="Jump to">
+      <a href="#install">Install</a><a href="#rhythm">Routine</a><a href="#expense">Expense</a><a href="#invoice">Invoice</a>
+      <a href="#payment">Payment</a><a href="#bank">Bank</a><a href="#settle">Settle up</a><a href="#gst">GST</a><a href="#yearend">Year-end</a>
+      <a href="#screens">Screens</a><a href="#settings">Settings</a><a href="#faq">FAQ</a>
+    </div>
+
+    <!-- ───────────── Welcome ───────────── -->
+    <section id="welcome" class="hero">
+      <div>
+        <div class="eyebrow">User guide · October 2026</div>
+        <h1>Run Tech Nerv’s books from your pocket.</h1>
+        <p class="lede">Invoices, expenses, who-owes-whom and tax prep in one place. Record things as they happen, and year-end becomes a download instead of a scramble.</p>
+        <div class="callout info"><b>Right now the app is full of sample data.</b>The clients, invoices and receipts are fictional so you can explore freely: edit, delete, try things. When you’re happy, ask for a <em>fresh start</em> and everything resets except your settings.</div>
+      </div>
+      <div class="phone" aria-hidden="true">
+        <div class="bigt">Good morning</div>
+        <div class="mini">Cash in bank<b>$124,347</b></div>
+        <div class="mini">Owed to you<b>$18,250</b><span style="color:var(--red)">$5,552 overdue</span></div>
+        <div class="mini">GST/HST · FY2026<b>$6,089</b></div>
+        <div class="tabbar"><span>Home</span><span>Invoices</span><span class="plus">+</span><span>Expenses</span><span>More</span></div>
+      </div>
+    </section>
+
+    <!-- ───────────── Install ───────────── -->
+    <section id="install">
+      <div class="eyebrow">Start</div>
+      <h2>Install it on your phone</h2>
+      <p class="muted">It installs like a normal app: its own icon, full screen, and a Tech Nerv launch screen. No App Store needed.</p>
+      <div class="grid two">
+        <div class="card">
+          <h3 style="margin-top:0">iPhone (Safari)</h3>
+          <ol class="steps">
+            <li><b>Open the app’s address in Safari</b>Then sign in with your email code.</li>
+            <li><b>Tap Share</b>The square with an arrow, in the toolbar.</li>
+            <li><b>Add to Home Screen → Add</b>Open it from the new icon from now on.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Android (Chrome)</h3>
+          <ol class="steps">
+            <li><b>Open the address in Chrome</b>A small “Install” prompt may appear on its own.</li>
+            <li><b>⋮ menu → Install app</b>Or “Add to Home screen”.</li>
+            <li><b>Long-press the icon</b>Shortcuts: Add expense, Snap a receipt, New invoice, Review.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="callout tip"><b>In the installed app</b>Pull down from the top of any screen to refresh. If you’re offline you’ll see a clear banner; nothing financial is stored on the phone. After an update you’ll get “A new version is ready → Reload”. The same steps are inside the app under <b>Settings → Install on your phone</b>.</div>
+    </section>
+
+    <!-- ───────────── Tour ───────────── -->
+    <section id="tour">
+      <div class="eyebrow">Start</div>
+      <h2>A quick tour</h2>
+      <p class="muted">On a phone you get a floating tab bar. On a computer, a sidebar.</p>
+      <div class="group">
+        <div class="row"><span class="tile" style="background:#0680A2">⌂</span><div><div class="t">Home</div><div class="s">Cash, money owed to you, GST estimate, owner balances, a <b>Needs attention</b> list, deadlines and recent activity. Start here.</div></div></div>
+        <div class="row"><span class="tile" style="background:#05A38C">≡</span><div><div class="t">Invoices</div><div class="s">Everything you bill. The red badge counts overdue invoices.</div></div></div>
+        <div class="row"><span class="tile" style="background:#03DDAA;color:#032920">+</span><div><div class="t">The + button</div><div class="s">Add anything fast: expense, snap a receipt, invoice, estimate, payment received, trip, import a statement, owner transfer.</div></div></div>
+        <div class="row"><span class="tile" style="background:#E8833A">$</span><div><div class="t">Expenses</div><div class="s">Every dollar out: who spent it, on what, with which card, and whether it was for the business.</div></div></div>
+        <div class="row"><span class="tile" style="background:#5B6B70">⋯</span><div><div class="t">More</div><div class="s">Estimates, payments, clients, subscriptions, mileage, banking & review, owner balances, Tax Centre, reports, documents, settings, plus a search bar.</div></div></div>
+      </div>
+      <p class="small muted">Search everything from the magnifier on Home (or <kbd>⌘</kbd><kbd>K</kbd> on a computer): clients, invoice numbers, vendors, amounts, documents.</p>
+    </section>
+
+    <!-- ───────────── Rhythm ───────────── -->
+    <section id="rhythm">
+      <div class="eyebrow">Your routine</div>
+      <h2>The day-to-day rhythm</h2>
+      <p class="muted">Here’s how we expect the two of you to use it. A minute here and there beats a weekend at tax time.</p>
+
+      <div class="when">
+        <div class="lbl">Every time you spend<span>30 seconds, on your phone</span></div>
+        <div class="group">
+          <div class="row"><span class="tile" style="background:#D9467A">◉</span><div><div class="t">Tap + → Snap receipt</div><div class="s">Photograph the receipt, type the amount, pick the vendor (the rest fills itself in from last time), check <b>Paid with</b> and <b>What was it for</b>. Save. Then throw the paper away.</div></div></div>
+          <div class="row"><span class="tile" style="background:#5E7CE2">→</span><div><div class="t">Drove to a client? Tap + → Trip</div><div class="s">Pick a frequent route, toggle round trip, save.</div></div></div>
+        </div>
+      </div>
+
+      <div class="when">
+        <div class="lbl">When you finish work<span>Same day</span></div>
+        <div class="group">
+          <div class="row"><span class="tile" style="background:#05A38C">≡</span><div><div class="t">Create the invoice</div><div class="s">+ → Invoice (or Duplicate last on the client page). Download or Share the PDF, send it yourselves by email or message, then tap <b>Mark as sent</b>.</div></div></div>
+          <div class="row"><span class="tile" style="background:#7C4DDB">✓</span><div><div class="t">Quoting a new project?</div><div class="s">+ → Estimate. When they say yes, <b>Accept → Convert to invoice</b>.</div></div></div>
+        </div>
+      </div>
+
+      <div class="when">
+        <div class="lbl">When money arrives<span>e-Transfer, EFT, cheque, wire</span></div>
+        <div class="group">
+          <div class="row"><span class="tile" style="background:#03BB90">✓</span><div><div class="t">Record payment</div><div class="s">On the invoice, tap <b>Record payment</b>. It fills in the balance and today’s date; pick the method. The invoice turns <span class="badge b-accent">Paid</span> or <span class="badge b-orange">Partly paid</span>.</div></div></div>
+        </div>
+      </div>
+
+      <div class="when">
+        <div class="lbl">Weekly<span>Monday, 5 minutes</span></div>
+        <div class="group">
+          <div class="row"><span class="tile" style="background:#0680A2">⌂</span><div><div class="t">Open Home → Needs attention</div><div class="s">Clear anything listed: overdue invoices (<b>Copy reminder</b> and send it), receipts missing, drafts not sent, estimates awaiting a reply.</div></div></div>
+          <div class="row"><span class="tile" style="background:#D9467A">↻</span><div><div class="t">Subscriptions due this week</div><div class="s">Tap <b>Log this month’s charge</b> for any that billed.</div></div></div>
+        </div>
+      </div>
+
+      <div class="when">
+        <div class="lbl">Monthly<span>First week, ~15 minutes</span></div>
+        <div class="group">
+          <div class="row"><span class="tile" style="background:#0680A2">⇩</span><div><div class="t">Import the bank & card statements</div><div class="s">Download last month’s CSV from EQ Bank and from the card website → + → Import statement. Duplicates are skipped automatically.</div></div></div>
+          <div class="row"><span class="tile" style="background:#E5A00D">☰</span><div><div class="t">Review queue</div><div class="s">More → Review. Swipe right to accept the suggested match, left to ignore; or tap <b>Create expense</b> for anything you forgot. Say yes to “Always do this for …?” and next month gets faster.</div></div></div>
+          <div class="row"><span class="tile" style="background:#5B6B70">✓</span><div><div class="t">Reconcile & file the statement</div><div class="s">Banking → account → Reconcile: type the statement’s closing balance; it should show $0.00 difference. Upload the statement PDF to Documents.</div></div></div>
+          <div class="row"><span class="tile" style="background:#05A38C">⇄</span><div><div class="t">Retainers</div><div class="s">Invoices → Recurring → <b>Create due drafts</b>, check them, send.</div></div></div>
+        </div>
+      </div>
+
+      <div class="when">
+        <div class="lbl">Quarterly<span>~10 minutes</span></div>
+        <div class="group">
+          <div class="row"><span class="tile" style="background:#05A38C">⚖</span><div><div class="t">Settle up between you and the company</div><div class="s">More → Owner balances. If the company owes you for out-of-pocket spending or mileage, tap <b>Settle up</b> and send the e-Transfer. If you owe the company for personal charges on the card, repay it (watch the repay-by dates).</div></div></div>
+        </div>
+      </div>
+
+      <div class="when">
+        <div class="lbl">Year-end<span>After Sept 30</span></div>
+        <div class="group">
+          <div class="row"><span class="tile" style="background:#E0352B">✓</span><div><div class="t">Tax Centre → Year-end readiness</div><div class="s">Work down the checklist until it’s green. Each item links straight to what needs fixing.</div></div></div>
+          <div class="row"><span class="tile" style="background:#E0352B">%</span><div><div class="t">GST/HST return (due Dec 31)</div><div class="s">Tax Centre → GST/HST return → copy each line into CRA My Business Account → <b>Mark as filed</b>.</div></div></div>
+          <div class="row"><span class="tile" style="background:#7C4DDB">⇩</span><div><div class="t">Send the accountant the package</div><div class="s">Tax Centre → T2 year-end package → <b>Download package</b>: a zip with every CSV, all receipts and a summary PDF.</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────── Golden rules ───────────── -->
+    <section id="golden">
+      <div class="eyebrow">Your routine</div>
+      <h2>The golden rules</h2>
+      <div class="grid two">
+        <div class="card"><b>1. Record it when it happens.</b><p class="muted small" style="margin:4px 0 0">The receipt is in your hand right now; in three months it won’t be.</p></div>
+        <div class="card"><b>2. Always say how it was paid.</b><p class="muted small" style="margin:4px 0 0">Business card, EQ Bank, or your personal card. This is what keeps the owner balances right.</p></div>
+        <div class="card"><b>3. Be honest about personal vs business.</b><p class="muted small" style="margin:4px 0 0">Wrong card for groceries? Record it as <em>Personal</em>. It’s never deducted, and it shows what you owe the company.</p></div>
+        <div class="card"><b>4. Attach receipts to business expenses.</b><p class="muted small" style="margin:4px 0 0">CRA can ask for them to support GST claimed back. Photos are compressed automatically.</p></div>
+        <div class="card"><b>5. Don’t delete issued invoices. Void them.</b><p class="muted small" style="margin:4px 0 0">Editing a sent invoice keeps the old version with a reason. Your audit trail stays clean.</p></div>
+        <div class="card"><b>6. Import the bank monthly.</b><p class="muted small" style="margin:4px 0 0">It’s the safety net that catches anything you forgot to record.</p></div>
+      </div>
+    </section>
+
+    <!-- ───────────── How-tos ───────────── -->
+    <section id="expense">
+      <div class="eyebrow">How to</div>
+      <h2>Add an expense</h2>
+      <ol class="steps">
+        <li><b>Tap + → Expense (or Snap receipt)</b>On a computer press <kbd>E</kbd>.</li>
+        <li><b>Type the total</b>Switch CAD/USD if needed. USD converts at the Bank of Canada rate for that date.</li>
+        <li><b>Add the receipt</b>Take photo or Add file (PDFs too). Optional but strongly recommended.</li>
+        <li><b>Vendor</b>Start typing; picking a past vendor fills in category, card, tax and project from last time.</li>
+        <li><b>Who spent and Paid with</b>Your avatar and the card or account used.</li>
+        <li><b>What was it for</b>Business, Personal, or Mixed with a business % slider. The green line underneath explains what will happen, e.g. “Business expense · company owes Deeparsh $42.10”.</li>
+        <li><b>Sales tax</b>Pick the preset that matches the receipt (BC goods = GST 5% + PST 7%; services = GST 5%; Ontario = HST 13%; foreign = none). The amounts are worked back from the total; adjust if the receipt differs.</li>
+        <li><b>Save</b>Or <b>Save & add another</b> when you’re catching up on a pile.</li>
+      </ol>
+      <div class="callout tip"><b>Extras on the form</b>Category (meals are automatically 50% deductible; equipment is treated as a capital asset), project, <b>billable</b> (re-bill it to a client later), tags and notes. The app warns you about likely duplicates.</div>
+      <p class="small muted">Edit anytime: Expenses → tap it → Edit. You can also <b>Duplicate</b>, <b>Delete</b>, or <b>Mark settled</b>. List filters: <em>No receipt</em>, <em>To settle</em>, <em>Personal</em>, plus who / paid with / category / period / tag.</p>
+    </section>
+
+    <section id="personal">
+      <h2>Business, personal or mixed: what happens</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>You record…</th><th>Paid with the business card / EQ</th><th>Paid with your own card</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge b-accent">Business</span></td><td>A normal business expense.</td><td>A business expense, <b>and the company owes you</b> the money back.</td></tr>
+          <tr><td><span class="badge b-purple">Personal</span></td><td>Not an expense. <b>You owe the company</b> (a shareholder loan), with a repay-by date.</td><td>Not the company’s business; don’t record it.</td></tr>
+          <tr><td><span class="badge b-blue">Mixed</span> (e.g. 60%)</td><td>60% is a business expense; you owe the company the other 40%.</td><td>60% is a business expense the company owes you; 40% is yours.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout warn"><b>Shareholder-loan deadline</b>Personal money taken through the company has to be repaid by the end of the <em>following</em> fiscal year (e.g. something from FY2026 by Sept 30, 2027), or CRA treats it as income. Owner balances shows the date for every open item and warns you in advance.</div>
+    </section>
+
+    <section id="invoice">
+      <h2>Create & send an invoice</h2>
+      <ol class="steps">
+        <li><b>+ → Invoice</b>Or on a client’s page: <b>New invoice</b> / <b>Duplicate last</b>. On a computer press <kbd>I</kbd>.</li>
+        <li><b>Pick the client</b>Tax and currency follow them: BC/AB → GST 5%, Ontario → HST 13%, Nova Scotia → HST 14%, US → zero-rated in USD.</li>
+        <li><b>Add lines</b>Pick from Products & services or type your own: description, detail line, quantity, unit, price. Reorder with the arrows.</li>
+        <li><b>Check dates & extras</b>Due date presets (on receipt / 7 / 15 / 30 days), PO number, project, discount (applied before tax), notes and terms.</li>
+        <li><b>Save draft</b> or <b>Save & mark sent</b>.</li>
+        <li><b>Send it yourselves</b>On the invoice: <b>Share</b> (phone: send the PDF by Mail, Messages, WhatsApp…) or <b>Download PDF</b>.</li>
+      </ol>
+      <h3>On an invoice you can also…</h3>
+      <div class="group">
+        <div class="row noicon"><div><div class="t">Copy reminder</div><div class="s">A polite reminder with amount, due date and how to pay, ready to paste into an email. Records that you reminded them.</div></div></div>
+        <div class="row noicon"><div><div class="t">Edit after sending</div><div class="s">It asks what changed and keeps the old version. Revisions lists every version, and any old PDF can be re-created.</div></div></div>
+        <div class="row noicon"><div><div class="t">Duplicate · Void · Back to draft · Credit note</div><div class="s">Void instead of deleting. A credit note refunds or discounts after the fact.</div></div></div>
+        <div class="row noicon"><div><div class="t">Save PDF copy to records</div><div class="s">Stores an exact copy of what you sent.</div></div></div>
+        <div class="row noicon"><div><div class="t">Recurring</div><div class="s">Invoices → Recurring: monthly retainers, pause/resume, <b>Create due drafts</b>.</div></div></div>
+      </div>
+      <p class="small muted">Invoice design: Settings → Branding & invoices (theme, colour, logo, footer, payment details) with a live preview.</p>
+    </section>
+
+    <section id="estimate">
+      <h2>Estimates → invoices</h2>
+      <p>+ → Estimate works like an invoice, with a “valid until” date and an acceptance line on the PDF. Then: <b>Mark sent</b> → <b>Accept</b> or <b>Decline</b> → <b>Convert to invoice</b> (lines copied, linked both ways). Estimates shows the win rate.</p>
+    </section>
+
+    <section id="payment">
+      <h2>Record a payment you received</h2>
+      <ol class="steps">
+        <li><b>From the invoice: Record payment</b>Or + → Payment received, then choose the client.</li>
+        <li><b>Check the allocation</b>One payment can cover several invoices; it fills the oldest first, and you can adjust each one.</li>
+        <li><b>Method, date, account, reference</b>e-Transfer reference, cheque number, etc. CAD goes into EQ Bank Business, USD into EQ USD.</li>
+      </ol>
+      <p class="small muted">Made a mistake? Payments → tap it → Edit or Delete; the invoice status updates itself. Bank deposits can also be turned into payments during bank review.</p>
+    </section>
+
+    <section id="bank">
+      <h2>Import & review the bank</h2>
+      <ol class="steps">
+        <li><b>Download a CSV</b>EQ Bank online banking → account → download icon → CSV. Card: your card website’s transaction export.</li>
+        <li><b>+ → Import statement</b>Choose the account, pick the file (works with the iPhone Files app), check the preview, import. You’ll see something like “128 new · 14 duplicates skipped”.</li>
+        <li><b>Review</b>One transaction at a time with suggestions. Swipe right = accept the top suggestion, left = ignore. Or Match, Create expense, Record income (e.g. interest), Client payment, or Transfer (moving money between your own accounts, like paying the card).</li>
+        <li><b>Make rules</b>“Always do this for LINKEDIN…?” sets the category, vendor name and business/personal automatically next time. Manage them in More → Rules.</li>
+        <li><b>Reconcile</b>Monthly, enter the statement’s closing balance and aim for $0.00 difference.</li>
+      </ol>
+      <div class="callout info"><b>Mistakes are reversible</b>Every review action has Undo. A whole import can be undone from Banking → Import history.</div>
+    </section>
+
+    <section id="settle">
+      <h2>Settle up between owners and the company</h2>
+      <p>More → <b>Owner balances</b> shows, for each of you, whether the company owes you or you owe it, and why: out-of-pocket spending, personal charges, mileage, start-up loans, reimbursements, repayments.</p>
+      <ol class="steps">
+        <li><b>Tap Settle up</b>Pick the type: Reimbursement (company pays you), Repayment (you pay the company), Contribution, Dividend, Salary, Other.</li>
+        <li><b>Choose what it covers</b>The amount defaults to what clears your open items. <em>Offset only</em> settles both directions without moving money.</li>
+        <li><b>Send the actual e-Transfer</b>The app records it; your bank moves it.</li>
+      </ol>
+    </section>
+
+    <section id="mileage">
+      <h2>Log a trip</h2>
+      <p>+ → Trip: date, from, to, purpose, km (toggle <b>round trip</b>), who, project. The CRA rate (73¢ per km for the first 5,000 km each year, 67¢ after) is applied automatically, and the trip adds to what the company owes you. Mileage → <b>Reimburse</b> pays it out; <b>Export</b> gives a CRA-style logbook.</p>
+    </section>
+
+    <section id="subs">
+      <h2>Subscriptions</h2>
+      <p>More → Subscriptions lists recurring tools (OpenAI, Google Workspace, Twilio…) with monthly and yearly cost in CAD and the next charge. Tap <b>Log this month’s charge</b> when one bills; you’ll get a badge if the price changed. Pause one with its switch.</p>
+    </section>
+
+    <section id="docs">
+      <h2>Keep documents</h2>
+      <p>More → Documents is the company filing cabinet, by fiscal year: incorporation papers, GST registration, filed returns, notices of assessment, contracts, insurance, monthly statements. Add with <b>Upload</b>; set an expiry date to get a reminder. The <b>Statements tracker</b> shows which months are missing for each account; tap + to upload that month.</p>
+    </section>
+
+    <section id="gst">
+      <h2>File the GST/HST return (annually, due Dec 31)</h2>
+      <ol class="steps">
+        <li><b>Tax Centre → GST/HST return</b>Choose the fiscal year (it defaults to the one that just ended).</li>
+        <li><b>Clear the checks</b>Expenses claiming GST with no receipt, foreign vendors that charged GST, unusual tax codes.</li>
+        <li><b>Copy each line into CRA</b>Every GST34 line (101, 103, 106, 109…) has a Copy button. Type in anything that’s yours to fill (instalments paid, adjustments).</li>
+        <li><b>Mark as filed</b>Date, confirmation number, amount and paid date. Attach the CRA confirmation; it goes into Documents.</li>
+      </ol>
+      <div class="callout warn"><b>Instalments</b>If the net tax is $3,000 or more, CRA expects quarterly instalments the following year. The worksheet tells you when this applies.</div>
+    </section>
+
+    <section id="yearend">
+      <h2>Year-end for the accountant (T2)</h2>
+      <p>Tax Centre → <b>T2 year-end package</b> shows the income statement grouped the way CRA wants it (GIFI codes), meals add-backs, capital assets with a depreciation (CCA) estimate, shareholder balances, receivables and bank balances at Sept 30. <b>Download package</b> gives one zip with everything, including every receipt. Send it to your accountant.</p>
+      <div class="callout info"><b>Close the books</b>Once the return is filed, Settings → Tax → <b>Close the books</b> locks that year so nothing changes by accident. It can be reopened.</div>
+    </section>
+
+    <!-- ───────────── Reference ───────────── -->
+    <section id="screens">
+      <div class="eyebrow">Reference</div>
+      <h2>Every screen & what you can do there</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th style="width:24%">Screen</th><th>Options</th></tr></thead>
+        <tbody>
+          <tr><td><b>Home</b></td><td>Swipe the cards (cash, owed to you, GST, owner balances); tap any to drill in. Needs attention, 12-month chart (hover or tap a month), deadlines, recent activity, search, install hint.</td></tr>
+          <tr><td><b>Invoices</b></td><td>Filters All / Outstanding / Overdue / Drafts / Paid; search; overdue age buckets; New menu (invoice, estimate, credit note, duplicate last); Recurring. Desktop: sortable table, copy number.</td></tr>
+          <tr><td><b>Invoice detail</b></td><td>PDF preview, Share, Download, Open, Reminder, Record payment, Edit (with reason), Duplicate, Mark sent / draft, Void, Credit note, Save copy to records, Revisions, Timeline.</td></tr>
+          <tr><td><b>Estimates</b></td><td>Draft / Sent / Accepted / Declined, valid-until, Accept, Decline, Convert, win rate.</td></tr>
+          <tr><td><b>Payments</b></td><td>By month, filter by method/client, search references, record, edit, delete.</td></tr>
+          <tr><td><b>Clients</b></td><td>Active / Owing / Archived, sort, CSV export. Client page: call, email, copy address, maps; KPIs incl. average days to pay; invoices, payments, projects, notes; statement PDF; archive.</td></tr>
+          <tr><td><b>Projects</b></td><td>Budget vs billed, profit and margin, invoices, unbilled expenses → “Invoice these”.</td></tr>
+          <tr><td><b>Expenses</b></td><td>All / No receipt / To settle / Personal; filter by who, paid with, category, period, tag; search; totals (deductible, GST claimable, capital); sort on desktop.</td></tr>
+          <tr><td><b>Expense detail</b></td><td>Receipts (view, download, delete), tax treatment card, bank match, settlement and repay-by date, Edit, Duplicate, Delete, Mark settled.</td></tr>
+          <tr><td><b>Subscriptions</b></td><td>Monthly/yearly cost, due this week, price changes, Log charge, edit, pause.</td></tr>
+          <tr><td><b>Mileage</b></td><td>Per-owner km & $ with the 5,000 km tier, trips by month, frequent routes, round trip, Reimburse, logbook export.</td></tr>
+          <tr><td><b>Owner balances</b></td><td>Who owes whom with a breakdown, shareholder-loan dates, ledger with running balance, Settle up (6 kinds, offset only).</td></tr>
+          <tr><td><b>Banking</b></td><td>Accounts with balance and to-review counts, Import, import history (download original, undo), per-account transactions, Reconcile.</td></tr>
+          <tr><td><b>Review</b></td><td>Swipe or tap: Match, Create expense, Record income, Client payment, Transfer, Ignore, Undo, make a rule. Desktop keys: <kbd>j</kbd>/<kbd>k</kbd> <kbd>m</kbd> <kbd>e</kbd> <kbd>p</kbd> <kbd>r</kbd> <kbd>t</kbd> <kbd>i</kbd> <kbd>u</kbd>.</td></tr>
+          <tr><td><b>Rules</b></td><td>“Contains” text → vendor name, category, business/personal, project; test how many match; apply to the queue.</td></tr>
+          <tr><td><b>Tax Centre</b></td><td>Fiscal year picker, key numbers, readiness checklist, deadlines (add, mark filed), GST/HST worksheet, T2 package.</td></tr>
+          <tr><td><b>Reports</b></td><td>Profit & loss, expenses by category, spending by owner & account, revenue by client, receivables aging, cash flow; any period; CSV export.</td></tr>
+          <tr><td><b>Documents</b></td><td>By year & type, search, upload, preview, expiring soon, statements tracker.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="settings">
+      <h2>Settings you can tweak</h2>
+      <p class="muted">Everything global lives in Settings (More → Settings, or your avatar on Home).</p>
+      <div class="hdr">Business</div>
+      <div class="group">
+        <div class="row noicon"><div><div class="t">Company</div><div class="s">Legal & operating name, business number, GST/HST number, BC incorporation number, address, email, phone, website, timezone.</div></div></div>
+        <div class="row noicon"><div><div class="t">Branding & invoices</div><div class="s">Logo; theme <em>Studio</em>, <em>Midnight</em> or <em>Minimal</em>; accent colour; thank-you line; footer; payment instructions, e-Transfer email, bank details; invoice/estimate numbering; default terms; estimate validity. Live PDF preview.</div></div></div>
+        <div class="row noicon"><div><div class="t">Tax</div><div class="s">Filing period, fiscal year-end, GST registration date, quick method, default tax code, tax rates, receipt threshold, close / reopen the books.</div></div></div>
+      </div>
+      <div class="hdr">Books</div>
+      <div class="group">
+        <div class="row noicon"><div><div class="t">Members</div><div class="s">Names, emails, initials, colours, ownership %.</div></div></div>
+        <div class="row noicon"><div><div class="t">Accounts</div><div class="s">Bank, card and personal accounts: name, institution, currency, last 4, colour, archive.</div></div></div>
+        <div class="row noicon"><div><div class="t">Categories</div><div class="s">Expense & income categories with CRA code (GIFI), deductible %, capital asset & CCA class, icon, colour, order.</div></div></div>
+        <div class="row noicon"><div><div class="t">Products & services</div><div class="s">The catalogue the invoice editor picks from.</div></div></div>
+      </div>
+      <div class="hdr">Rules & app</div>
+      <div class="group">
+        <div class="row noicon"><div><div class="t">Mileage</div><div class="s">Per-km rates (one tap to use CRA’s current rates).</div></div></div>
+        <div class="row noicon"><div><div class="t">Owners & loans</div><div class="s">How early to warn about shareholder-loan deadlines.</div></div></div>
+        <div class="row noicon"><div><div class="t">Install on your phone · Appearance</div><div class="s">Install steps; System / Light / Dark.</div></div></div>
+        <div class="row noicon"><div><div class="t">Data & storage · Activity · Account</div><div class="s">Storage used and saved by compression, Export everything (zip of CSVs), full activity history, sign out.</div></div></div>
+      </div>
+    </section>
+
+    <section id="shortcuts">
+      <h2>Shortcuts & tricks</h2>
+      <div class="grid two">
+        <div class="card"><b>On a computer</b>
+          <p class="small muted" style="margin:6px 0 0"><kbd>⌘</kbd><kbd>K</kbd> search · <kbd>N</kbd> add anything · <kbd>E</kbd> new expense · <kbd>I</kbd> new invoice · <kbd>⌘</kbd><kbd>S</kbd> save in editors · <kbd>Esc</kbd> close a sheet · on an invoice <kbd>D</kbd> download, <kbd>P</kbd> payment, <kbd>R</kbd> reminder.</p></div>
+        <div class="card"><b>On a phone</b>
+          <p class="small muted" style="margin:6px 0 0">Drag sheets down to close · pull down to refresh (installed app) · long-press the icon for shortcuts (Android) · swipe in Review · tap any Home card to drill in.</p></div>
+        <div class="card"><b>Undo is everywhere</b>
+          <p class="small muted" style="margin:6px 0 0">Most actions show a toast with <b>Undo</b>. Only truly destructive things ask “Are you sure?”.</p></div>
+        <div class="card"><b>Deep links</b>
+          <p class="small muted" style="margin:6px 0 0">“Needs attention” items open the exact filtered list. From a client: invoice, estimate, payment, statement in one tap.</p></div>
+      </div>
+    </section>
+
+    <section id="glossary">
+      <h2>Glossary</h2>
+      <div class="tablewrap"><table><tbody>
+        <tr><td style="width:28%"><b>ITC</b></td><td>Input tax credit: GST/HST you paid on business purchases and claim back on your return.</td></tr>
+        <tr><td><b>Zero-rated</b></td><td>Taxable at 0%, e.g. services exported to a US client. You still report the sale.</td></tr>
+        <tr><td><b>Place of supply</b></td><td>The client’s province decides GST (5%) vs HST (13–15%).</td></tr>
+        <tr><td><b>GIFI</b></td><td>CRA’s standard codes for financial statements on the T2 (e.g. 8523 meals).</td></tr>
+        <tr><td><b>CCA</b></td><td>Capital cost allowance: tax depreciation on equipment such as computers (class 50) and furniture (class 8).</td></tr>
+        <tr><td><b>Shareholder loan</b></td><td>Money the company paid for an owner’s personal things. Repay it in time or it becomes income.</td></tr>
+        <tr><td><b>Reconcile</b></td><td>Confirm the app’s balance matches the bank statement for a month.</td></tr>
+        <tr><td><b>Fiscal year (FY)</b></td><td>Named for the year it ends: FY2026 = Oct 1, 2025 – Sep 30, 2026.</td></tr>
+      </tbody></table></div>
+    </section>
+
+    <section id="faq" class="faq">
+      <h2>FAQ</h2>
+      <details><summary>Does the app email invoices to clients?</summary><p>No, by design. Download or Share the PDF and send it yourselves from Mail, Gmail or Messages, then tap Mark as sent. Copy reminder gives you ready-made text.</p></details>
+      <details><summary>I paid for a business thing with my personal card. What do I do?</summary><p>Add the expense as Business with Paid with = your personal account. The company now owes you; settle up later from Owner balances.</p></details>
+      <details><summary>I used the business card for something personal.</summary><p>Add it as Personal with Paid with = Business Card. It isn’t deducted and shows as money you owe the company. Repay it by the date shown.</p></details>
+      <details><summary>The phone bill is partly business. How?</summary><p>Choose Mixed and set the business %. Only that share is deducted and only that share’s GST is claimed.</p></details>
+      <details><summary>Can I bill a client for an expense?</summary><p>Turn on Billable on the expense with a project. The project page lists unbilled expenses, and “Invoice these” creates the invoice lines.</p></details>
+      <details><summary>What if I import the same bank file twice?</summary><p>Nothing happens. Duplicates are detected and skipped. You can also undo a whole import.</p></details>
+      <details><summary>A client paid in USD. Is that OK?</summary><p>Yes. USD clients are invoiced in USD (zero-rated); payments record the exchange rate, and reports convert to CAD.</p></details>
+      <details><summary>Is my data stored on the phone?</summary><p>No. Your books stay in your private, secured database. The installed app only keeps its own icons and code for speed. Signing in uses a one-time code emailed to you, and only the two of you can sign in.</p></details>
+      <details><summary>How do we start for real?</summary><p>When you’re happy with the demo, ask for a fresh start. All sample records and files are removed; your settings, members, accounts, categories and tax rates stay. Then update Company details and import your real statements.</p></details>
+    </section>
+
+    <footer>Tech Nerv Solutions Inc. · Kamloops, British Columbia · This guide lives in <code>docs/user-guide.html</code></footer>
+  </main>
+</div>
+</body>
+</html>

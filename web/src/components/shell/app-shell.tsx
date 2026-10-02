@@ -12,6 +12,7 @@ import { LogoMark } from './logo';
 import { Avatar } from '@/components/ui/avatar';
 import { Sheet } from '@/components/ui/sheet';
 import { Menu } from '@/components/ui/menu';
+import { PullToRefresh } from './pwa';
 
 export type ShellProps = {
   member: { full_name: string; color: string | null; initials: string | null; email: string };
@@ -57,7 +58,7 @@ export function AppShell({ member, company, counts, devSession, children }: Shel
   return (
     <div className="lg:flex" data-tabbar={editing ? 'hidden' : undefined}>
       {/* ───────── Desktop sidebar ───────── */}
-      <aside className="material-sidebar sticky top-0 hidden h-dvh w-[248px] shrink-0 flex-col shadow-[inset_-0.5px_0_0_var(--separator)] lg:flex">
+      <aside className="material-sidebar sticky top-0 hidden h-dvh w-[248px] shrink-0 flex-col pt-[var(--safe-top)] shadow-[inset_-0.5px_0_0_var(--separator)] lg:flex">
         <div className="flex h-[52px] items-center gap-2.5 px-4">
           <LogoMark size={26} />
           <div className="min-w-0 leading-tight">
@@ -124,6 +125,7 @@ export function AppShell({ member, company, counts, devSession, children }: Shel
       {/* ───────── Phone tab bar ───────── */}
       {!editing && <TabBar active={active} pathname={pathname} counts={counts} onAdd={() => setQuickAdd(true)} />}
       <QuickAddSheet open={quickAdd} onClose={() => setQuickAdd(false)} />
+      <PullToRefresh />
     </div>
   );
 }

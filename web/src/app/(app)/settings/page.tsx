@@ -1,11 +1,11 @@
 import { cookies } from 'next/headers';
 import {
-  Building2, Palette, Calculator, Users, Landmark, Shapes, Package, Car, Scale, SunMoon, HardDrive, History,
+  Building2, Palette, Calculator, Users, Landmark, Shapes, Package, Car, Scale, SunMoon, HardDrive, History, Smartphone,
 } from 'lucide-react';
 import { Page } from '@/components/ui/page';
 import { Section, Row, IconTile } from '@/components/ui/group';
 import { Avatar } from '@/components/ui/avatar';
-import { db, devBypassEmail } from '@/lib/db';
+import { db, devBypass } from '@/lib/db';
 import { monthDayLabel, cap, cents } from '@/components/settings/format';
 import { currentMember, businessProfile, allMembers } from '@/lib/session';
 import { bytes, plural, relativeDay, date } from '@/lib/format';
@@ -13,6 +13,7 @@ import { bytes, plural, relativeDay, date } from '@/lib/format';
 export const metadata = { title: 'Settings' };
 
 export default async function SettingsIndex() {
+  const devBypassEmail = await devBypass();
   const [me, profile, members, supabase, store] = await Promise.all([currentMember(), businessProfile(), allMembers(), db(), cookies()]);
   const [accounts, categories, items, files, activity] = await Promise.all([
     supabase.from('money_accounts').select('id', { count: 'exact', head: true }).eq('archived', false),
@@ -53,6 +54,7 @@ export default async function SettingsIndex() {
     {
       title: 'App',
       rows: [
+        { href: '/settings/install', icon: Smartphone, color: '#03BB90', title: 'Install on your phone', value: 'Home Screen app' },
         { href: '/settings/appearance', icon: SunMoon, color: '#3B4B4E', title: 'Appearance', value: theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'System' },
         { href: '/settings/data', icon: HardDrive, color: '#6B7B80', title: 'Data & storage', value: bytes(used) },
         { href: '/settings/activity', icon: History, color: '#E5A00D', title: 'Activity', value: activity.data ? relativeDay(activity.data.created_at) : undefined },

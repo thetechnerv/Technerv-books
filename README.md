@@ -5,10 +5,13 @@ Internal accounting app for **Tech Nerv Solutions Inc.**: invoices and estimates
 mileage, subscriptions, a GST/HST and year-end Tax Centre, reports and a document vault.
 
 ```
-web/       Next.js 16 app (App Router, Tailwind v4, Supabase)
+web/       Next.js 16 app (App Router, Tailwind v4, Supabase) — installable PWA
 harness/   Database tooling for the TechNerv-Internal Supabase project (schema `accounts`)
-docs/      Sample PDFs
+docs/      Engineering docs, the user guide and sample PDFs
 ```
+
+**Documentation:** [docs/README.md](docs/README.md) (architecture, database, every feature, decisions, roadmap)
+· **How to use the app:** [docs/user-guide.html](docs/user-guide.html)
 
 ## Run it locally
 

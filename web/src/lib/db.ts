@@ -1,5 +1,5 @@
 import 'server-only';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './database.types';
@@ -13,13 +13,30 @@ const PUBLISHABLE = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
  * Local development only: when DEV_AUTH_BYPASS_EMAIL is set and we're running
  * `next dev`, act as that member with the secret key so the app can be used
  * without an emailed sign-in code. Production builds never take this path.
+ *
+ * The dev server listens on the whole network, so the bypass is limited to
+ * requests addressed to localhost unless DEV_BYPASS_ALLOW_LAN=1 (e.g. to try
+ * the app on a phone over trusted Wi-Fi).
  */
-export const devBypassEmail =
-  process.env.NODE_ENV === 'development' ? process.env.DEV_AUTH_BYPASS_EMAIL || null : null;
+const bypassEmail = process.env.NODE_ENV === 'development' ? process.env.DEV_AUTH_BYPASS_EMAIL || null : null;
+
+export function bypassAllowedForHost(host: string | null) {
+  if (!bypassEmail) return false;
+  if (process.env.DEV_BYPASS_ALLOW_LAN === '1') return true;
+  const name = (host ?? '').replace(/:\d+$/, '').replace(/^\[|\]$/g, '');
+  return name === 'localhost' || name === '127.0.0.1' || name === '::1' || name.endsWith('.localhost');
+}
+
+/** The member email to act as for this request, or null when real sign-in applies. */
+export async function devBypass(): Promise<string | null> {
+  if (!bypassEmail) return null;
+  const h = await headers();
+  return bypassAllowedForHost(h.get('host')) ? bypassEmail : null;
+}
 
 /** Supabase client bound to the `accounts` schema for the current request. */
 export async function db(): Promise<Db> {
-  if (devBypassEmail) return adminDb();
+  if (await devBypass()) return adminDb();
   const store = await cookies();
   return createServerClient<Database, 'accounts'>(URL, PUBLISHABLE, {
     db: { schema: 'accounts' },

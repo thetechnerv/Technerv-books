@@ -152,7 +152,7 @@ function DesktopTable({ rows, query, fyLabel }: { rows: ClientSummary[]; query: 
     <div className="hidden lg:block">
       <div className="overflow-clip rounded-group bg-cell shadow-card">
         <table className="w-full border-collapse text-subhead">
-          <thead className="sticky top-[104px] z-10">
+          <thead className="sticky top-[var(--sticky-top)] z-10">
             <tr className="material-bar hairline-b">
               {cols.map((col) => (
                 <th key={col.label} scope="col" className={cn('px-3 py-2 text-caption font-semibold uppercase tracking-[0.04em] text-label-2', col.align === 'right' ? 'text-right' : 'text-left', col.label === 'Client' && 'pl-4')}>

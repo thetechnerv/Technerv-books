@@ -2,7 +2,7 @@
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { db, devBypassEmail, must } from '@/lib/db';
+import { db, devBypass, must } from '@/lib/db';
 import { currentMember } from '@/lib/session';
 import { parseProfile, validIsoDate } from '@/components/settings/validate';
 import type { ActionResult, Update } from '@/lib/types';
@@ -56,7 +56,7 @@ export async function setTheme(theme: ThemeChoice): Promise<ActionResult> {
 
 export async function signOut(): Promise<ActionResult> {
   await currentMember();
-  if (devBypassEmail) return { ok: false, error: 'Sign-in is skipped in local development, so there is nothing to sign out of.' };
+  if (await devBypass()) return { ok: false, error: 'Sign-in is skipped in local development, so there is nothing to sign out of.' };
   const supabase = await db();
   await supabase.auth.signOut();
   redirect('/login');

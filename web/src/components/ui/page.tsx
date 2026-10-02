@@ -26,7 +26,19 @@ type PageProps = {
  */
 export function Page({ title, subtitle, back, actions, toolbar, children, wide, className }: PageProps) {
   const sentinel = useRef<HTMLDivElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [toolbarH, setToolbarH] = useState(0);
+
+  // Publish how much sticky chrome sits above the content (nav bar + toolbar)
+  // as --sticky-top, so sticky table headers can park right underneath it.
+  useEffect(() => {
+    const el = toolbarRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setToolbarH(Math.round(e!.borderBoxSize[0]?.blockSize ?? el.offsetHeight)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const el = sentinel.current;
@@ -37,7 +49,7 @@ export function Page({ title, subtitle, back, actions, toolbar, children, wide, 
   }, []);
 
   return (
-    <div className={cn('min-h-dvh', className)}>
+    <div className={cn('min-h-dvh', className)} style={{ ['--sticky-top' as string]: `calc(52px + var(--safe-top) + ${toolbarH}px)` }}>
       {/* Nav bar */}
       <header
         className={cn(
@@ -81,6 +93,7 @@ export function Page({ title, subtitle, back, actions, toolbar, children, wide, 
 
       {toolbar && (
         <div
+          ref={toolbarRef}
           className={cn(
             'sticky z-20 transition-[background-color,box-shadow] duration-200',
             'top-[calc(52px+var(--safe-top))] lg:top-[52px]',

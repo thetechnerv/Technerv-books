@@ -3,12 +3,13 @@ import { Section, Row } from '@/components/ui/group';
 import { Avatar } from '@/components/ui/avatar';
 import { SignOutRow } from '@/components/settings/sign-out';
 import { currentMember } from '@/lib/session';
-import { devBypassEmail } from '@/lib/db';
+import { devBypass } from '@/lib/db';
 import { date } from '@/lib/format';
 
 export const metadata = { title: 'Account' };
 
 export default async function AccountSettings() {
+  const devBypassEmail = await devBypass();
   const me = await currentMember();
   return (
     <Page title="Account" back={{ href: '/settings', label: 'Settings' }}>

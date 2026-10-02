@@ -6,7 +6,11 @@ import { createServerClient } from '@supabase/ssr';
  * Authorization itself is enforced by Postgres row-level security.
  */
 export async function proxy(request: NextRequest) {
-  if (process.env.NODE_ENV === 'development' && process.env.DEV_AUTH_BYPASS_EMAIL) return NextResponse.next();
+  if (process.env.NODE_ENV === 'development' && process.env.DEV_AUTH_BYPASS_EMAIL) {
+    const host = request.headers.get('host')?.replace(/:\d+$/, '') ?? '';
+    const local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host.endsWith('.localhost');
+    if (local || process.env.DEV_BYPASS_ALLOW_LAN === '1') return NextResponse.next();
+  }
 
   let response = NextResponse.next({ request });
   const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
@@ -32,5 +36,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|manifest.webmanifest|.*\\.(?:png|svg|jpg|webp|woff2?)$).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|icons/|manifest.webmanifest|sw.js|offline.html|.*\\.(?:png|svg|jpg|webp|woff2?)$).*)'],
 };

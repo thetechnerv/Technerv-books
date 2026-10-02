@@ -123,7 +123,7 @@ function MobileRow({ r }: { r: ListRow }) {
 function SortHead({ k, label, sort, setSort, align = 'left', className }: { k: SortKey; label: string; sort: { key: SortKey; dir: 1 | -1 }; setSort: (s: { key: SortKey; dir: 1 | -1 }) => void; align?: 'left' | 'right'; className?: string }) {
   const on = sort.key === k;
   return (
-    <th className={cn('sticky top-[108px] z-10 bg-[var(--material-bar)] px-3 py-2 font-medium backdrop-blur-xl', align === 'right' && 'text-right', className)} aria-sort={on ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}>
+    <th className={cn('sticky top-[var(--sticky-top)] z-10 bg-[var(--material-bar)] px-3 py-2 font-medium backdrop-blur-xl', align === 'right' && 'text-right', className)} aria-sort={on ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}>
       <button
         type="button"
         onClick={() => setSort({ key: k, dir: on ? (sort.dir === 1 ? -1 : 1) : k === 'issued' || k === 'amount' ? -1 : 1 })}
@@ -165,7 +165,7 @@ function DesktopTable({ rows, sort, setSort, grouped }: { rows: ListRow[]; sort:
           <tr className="hairline-b">
             <SortHead k="number" label="Number" sort={sort} setSort={setSort} className="w-[120px] pl-4" />
             <SortHead k="client" label="Client" sort={sort} setSort={setSort} />
-            <th className="sticky top-[108px] z-10 bg-[var(--material-bar)] px-3 py-2 font-medium text-label-2 backdrop-blur-xl">Title</th>
+            <th className="sticky top-[var(--sticky-top)] z-10 bg-[var(--material-bar)] px-3 py-2 font-medium text-label-2 backdrop-blur-xl">Title</th>
             <SortHead k="issued" label="Issued" sort={sort} setSort={setSort} className="w-[96px]" />
             <SortHead k="due" label={isEst ? 'Valid until' : 'Due'} sort={sort} setSort={setSort} className="w-[150px]" />
             <SortHead k="status" label="Status" sort={sort} setSort={setSort} className="w-[110px]" />

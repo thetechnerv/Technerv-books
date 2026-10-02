@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { ToastProvider } from '@/components/ui/toast';
 import { ConfirmProvider } from '@/components/ui/confirm';
+import { PwaManager } from '@/components/shell/pwa';
+import { appleStartupImages } from '@/lib/pwa-splash';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
@@ -11,7 +13,8 @@ export const metadata: Metadata = {
   title: { default: 'Tech Nerv Accounts', template: '%s · Tech Nerv Accounts' },
   description: 'Invoices, expenses and tax-ready books for Tech Nerv Solutions Inc.',
   applicationName: 'Tech Nerv Accounts',
-  appleWebApp: { capable: true, title: 'TN Accounts', statusBarStyle: 'black-translucent' },
+  appleWebApp: { capable: true, title: 'TN Accounts', statusBarStyle: 'black-translucent', startupImage: appleStartupImages },
+  formatDetection: { telephone: false, email: false, address: false },
   robots: { index: false, follow: false },
 };
 
@@ -32,6 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <ToastProvider>
           <ConfirmProvider>{children}</ConfirmProvider>
+          <PwaManager />
         </ToastProvider>
       </body>
     </html>

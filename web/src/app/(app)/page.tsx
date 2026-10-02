@@ -9,6 +9,7 @@ import { BigMoney, Money } from '@/components/ui/money';
 import { Avatar } from '@/components/ui/avatar';
 import { BarChart } from '@/components/charts/bar-chart';
 import { SearchButton } from '@/components/shell/search-palette';
+import { InstallHint } from '@/components/shell/install-guide';
 import { db, must } from '@/lib/db';
 import { currentMember, businessProfile, allMembers } from '@/lib/session';
 import { cashPositions, receivables, gstForFiscalYear, monthlySeries } from '@/lib/finance';
@@ -76,6 +77,8 @@ export default async function Home() {
         </>
       }
     >
+      <InstallHint />
+
       {/* Headline numbers */}
       <div className="-mx-4 mb-7 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 no-scrollbar lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0">
         <StatCard href="/banking" label="Cash in bank" tint="var(--ocean)" icon={<Landmark className="size-4" />}>

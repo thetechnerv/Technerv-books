@@ -38,17 +38,18 @@ type RowProps = {
   destructive?: boolean;
   className?: string;
   children?: ReactNode;    // custom trailing content
+  wrap?: boolean;          // let title/subtitle wrap instead of truncating
 };
 
 /** A list row. Becomes a link or button when href / onClick is set. */
-export function Row({ icon, title, subtitle, value, detail, href, onClick, chevron, destructive, className, children }: RowProps) {
+export function Row({ icon, title, subtitle, value, detail, href, onClick, chevron, destructive, className, children, wrap }: RowProps) {
   const interactive = !!(href || onClick);
   const content = (
     <>
       {icon && <span className="flex shrink-0 items-center">{icon}</span>}
       <span className="min-w-0 flex-1 py-[11px] lg:py-2">
-        <span className={cn('block truncate', destructive ? 'text-red' : 'text-label')}>{title}</span>
-        {subtitle && <span className="mt-0.5 block truncate text-subhead text-label-2">{subtitle}</span>}
+        <span className={cn('block', !wrap && 'truncate', destructive ? 'text-red' : 'text-label')}>{title}</span>
+        {subtitle && <span className={cn('mt-0.5 block text-subhead text-label-2', !wrap && 'truncate')}>{subtitle}</span>}
       </span>
       {(value || detail) && (
         <span className="flex shrink-0 flex-col items-end text-right">

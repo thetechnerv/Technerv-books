@@ -1,13 +1,13 @@
 import 'server-only';
 import { cache } from 'react';
 import { redirect } from 'next/navigation';
-import { db, devBypassEmail, must } from './db';
+import { db, devBypass, must } from './db';
 import type { Row } from './types';
 
 /** The signed-in member, or a redirect to /login. Cached per request. */
 export const currentMember = cache(async (): Promise<Row<'members'>> => {
   const supabase = await db();
-  let email = devBypassEmail;
+  let email = await devBypass();
   if (!email) {
     const { data } = await supabase.auth.getUser();
     email = data.user?.email ?? null;

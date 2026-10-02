@@ -98,8 +98,8 @@ const COLS = 'grid grid-cols-[84px_minmax(0,1.7fr)_minmax(0,1.1fr)_36px_minmax(0
 /** Desktop: dense, sortable table grouped by month. */
 export function ExpenseTable({ groups, sortHrefs, sort }: { groups: MonthGroup[]; sortHrefs: Record<SortKey, string>; sort: string }) {
   return (
-    <div className="overflow-hidden rounded-group bg-cell shadow-card">
-      <div className={cn(COLS, 'material-bar sticky top-[52px] z-10 h-8 text-caption font-semibold uppercase tracking-[0.03em] text-label-2 hairline-b')}>
+    <div className="overflow-clip rounded-group bg-cell shadow-card">
+      <div className={cn(COLS, 'material-bar sticky top-[var(--sticky-top)] z-10 h-8 text-caption font-semibold uppercase tracking-[0.03em] text-label-2 hairline-b')}>
         <SortHead k="date" sort={sort} hrefs={sortHrefs}>Date</SortHead><SortHead k="vendor" sort={sort} hrefs={sortHrefs}>Vendor</SortHead><span>Category</span><span>Who</span><span>Paid with</span><span>Nature</span><SortHead k="amount" right sort={sort} hrefs={sortHrefs}>Total</SortHead><span className="text-right">ITC</span><span className="sr-only">Receipt</span>
       </div>
       {groups.map((g) => (
