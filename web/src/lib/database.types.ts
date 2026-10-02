@@ -1238,12 +1238,19 @@ export type Database = {
           color: string | null
           created_at: string
           email: string
+          failed_pin_attempts: number
           full_name: string
           id: string
           initials: string | null
+          last_sign_in_at: string | null
+          locked_until: string | null
+          must_change_password: boolean
           ownership_pct: number | null
+          password_changed_at: string | null
           preferences: Json
           role: string
+          temp_password_expires_at: string | null
+          temp_password_issued_by: string | null
           user_id: string | null
         }
         Insert: {
@@ -1251,12 +1258,19 @@ export type Database = {
           color?: string | null
           created_at?: string
           email: string
+          failed_pin_attempts?: number
           full_name: string
           id?: string
           initials?: string | null
+          last_sign_in_at?: string | null
+          locked_until?: string | null
+          must_change_password?: boolean
           ownership_pct?: number | null
+          password_changed_at?: string | null
           preferences?: Json
           role?: string
+          temp_password_expires_at?: string | null
+          temp_password_issued_by?: string | null
           user_id?: string | null
         }
         Update: {
@@ -1264,15 +1278,37 @@ export type Database = {
           color?: string | null
           created_at?: string
           email?: string
+          failed_pin_attempts?: number
           full_name?: string
           id?: string
           initials?: string | null
+          last_sign_in_at?: string | null
+          locked_until?: string | null
+          must_change_password?: boolean
           ownership_pct?: number | null
+          password_changed_at?: string | null
           preferences?: Json
           role?: string
+          temp_password_expires_at?: string | null
+          temp_password_issued_by?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "members_temp_password_issued_by_fkey"
+            columns: ["temp_password_issued_by"]
+            isOneToOne: false
+            referencedRelation: "member_balances"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "members_temp_password_issued_by_fkey"
+            columns: ["temp_password_issued_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mileage_trips: {
         Row: {

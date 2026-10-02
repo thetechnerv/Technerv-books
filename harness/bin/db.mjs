@@ -145,6 +145,35 @@ const commands = {
     });
     console.log(c.green('Sign-ups disabled; members can sign in with an email code.'));
   },
+  // Issue a 6-digit one-time code for a member (creates their sign-in if
+  // needed, clears any lockout). Prints it once; they choose a 4-digit PIN after.
+  async invite(email) {
+    if (!email) die('Usage: db invite <member email>');
+    const [m] = await q(`select id, full_name, email, user_id, active from accounts.members where lower(email) = lower(${lit(email)})`);
+    if (!m) die(`No member with email ${email}. Add them in Settings → Members first.`);
+    if (!m.active) die(`${m.full_name} is inactive.`);
+    const webEnv = join(ROOT, '..', 'web', '.env.local');
+    const pepper = existsSync(webEnv) ? readFileSync(webEnv, 'utf8').match(/^AUTH_PIN_PEPPER=(.+)$/m)?.[1]?.trim() : null;
+    if (!pepper) die('AUTH_PIN_PEPPER missing from web/.env.local — it must match the deployed app.');
+    const { randomInt, createHmac } = await import('node:crypto');
+    const code = String(randomInt(0, 1_000_000)).padStart(6, '0');
+    // Same derivation as web/src/lib/passwords.ts derivePassword()
+    const password = 'pin1.' + createHmac('sha256', pepper).update(`${m.email.trim().toLowerCase()}:${code}`).digest('base64url');
+    const secret = await secretKey();
+    const authApi = (path, method, body) => fetch(`https://${REF}.supabase.co/auth/v1/admin/${path}`, {
+      method, headers: { apikey: secret, Authorization: `Bearer ${secret}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    }).then(async (r) => { const j = await r.json(); if (!r.ok) throw new Error(j.msg ?? j.message ?? JSON.stringify(j)); return j; });
+    let userId = m.user_id;
+    if (!userId) {
+      const [u] = await q(`select id from auth.users where lower(email) = lower(${lit(m.email)})`);
+      userId = u?.id ?? null;
+    }
+    if (userId) await authApi(`users/${userId}`, 'PUT', { password, email_confirm: true, ban_duration: 'none' });
+    else userId = (await authApi('users', 'POST', { email: m.email, password, email_confirm: true, user_metadata: { full_name: m.full_name } })).id;
+    await q(`update accounts.members set user_id = ${lit(userId)}, must_change_password = true, failed_pin_attempts = 0, locked_until = null,
+      temp_password_expires_at = now() + interval '72 hours' where id = ${lit(m.id)}`);
+    console.log(`\n  ${c.bold(m.full_name)} <${m.email}>\n  One-time code: ${c.green(c.bold(code.slice(0, 3) + ' ' + code.slice(3)))}\n  ${c.dim('Sign in → enter email → "I have a one-time code" → then choose a 4-digit PIN. Works once, for 72 hours.')}\n`);
+  },
   // Writes web/.env.local with the URL, publishable key and secret key.
   async 'web-env'() {
     const keys = await api('GET', `/projects/${REF}/api-keys?reveal=true`);
@@ -234,6 +263,7 @@ const commands = {
   web-env              write web/.env.local
   types                regenerate web/src/lib/database.types.ts
   auth-setup           create auth users for members, disable sign-ups
+  invite <email>       issue a 6-digit one-time sign-in code for a member (prints it once)
   sample               load the synthetic demo dataset (+ receipt files)
   fresh-start --yes    delete all records & files, keep settings (go-live)
   reset --yes          drop the app schema (destructive)`);

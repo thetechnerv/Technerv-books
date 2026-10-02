@@ -29,9 +29,13 @@ export default async function AccountSettings() {
           <Row href="/settings/members" title="Edit profile" />
         </Section>
 
+        <Section title="PIN" footer={me.password_changed_at ? `Last changed ${date(me.password_changed_at)}. Forgot it? Another owner can give you a one-time code in Settings → Members.` : 'Forgot it? Another owner can give you a one-time code in Settings → Members.'}>
+          <Row href="/set-password?next=/settings/account" title="Change PIN" />
+        </Section>
+
         <Section footer={devBypassEmail
-          ? `Sign-in is skipped in local development: the app acts as ${devBypassEmail} (DEV_AUTH_BYPASS_EMAIL in .env.local). In production you sign in with a code emailed to you.`
-          : 'You’ll need a new emailed code to sign back in.'}
+          ? `Sign-in is skipped in local development: the app acts as ${devBypassEmail} (DEV_AUTH_BYPASS_EMAIL in .env.local). In production you sign in with your email and 4-digit PIN.`
+          : 'Sign back in with your email and PIN.'}
         >
           <SignOutRow disabled={!!devBypassEmail} />
         </Section>

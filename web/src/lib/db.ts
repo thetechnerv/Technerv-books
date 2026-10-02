@@ -34,6 +34,25 @@ export async function devBypass(): Promise<string | null> {
   return bypassAllowedForHost(h.get('host')) ? bypassEmail : null;
 }
 
+/** Cookie-session client that always talks to Supabase Auth as the real user (ignores the dev bypass). */
+export async function sessionClient(): Promise<Db> {
+  const store = await cookies();
+  return createServerClient<Database, 'accounts'>(URL, PUBLISHABLE, {
+    db: { schema: 'accounts' },
+    cookies: {
+      getAll: () => store.getAll(),
+      setAll: (list) => {
+        try { list.forEach(({ name, value, options }) => store.set(name, value, options)); } catch { /* read-only in RSC */ }
+      },
+    },
+  });
+}
+
+/** A throwaway client used only to check a password without touching the session cookie. */
+export function passwordProbe() {
+  return createClient(URL, PUBLISHABLE, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+}
+
 /** Supabase client bound to the `accounts` schema for the current request. */
 export async function db(): Promise<Db> {
   if (await devBypass()) return adminDb();

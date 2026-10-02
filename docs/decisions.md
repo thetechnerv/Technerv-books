@@ -4,6 +4,12 @@
 
 Newest first. Add a line whenever behaviour, scope or an assumption changes.
 
+## 2026-10-02 — PIN sign-in replaces email codes
+- Supabase's email sender hit its rate limit, and the owners want no email-based auth. Now: email +
+  **4-digit PIN**; owners issue **6-digit one-time codes** to invite or reset; first sign-in forces a
+  new PIN. PIN → HMAC with server pepper (`AUTH_PIN_PEPPER`) → Supabase password (bcrypt). Lockout
+  5 → 15 min, 10 → owner reset. Migrations 0080–0081. Harness `invite <email>` for bootstrap.
+
 ## 2026-10-02 — Deployed to Vercel
 - Vercel project `technerv-books` (team tech-nerv), Git-connected to `thetechnerv/Technerv-books`, root directory `web`.
   Production: https://technerv-books.vercel.app

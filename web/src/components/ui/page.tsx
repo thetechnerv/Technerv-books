@@ -28,7 +28,16 @@ export function Page({ title, subtitle, back, actions, toolbar, children, wide, 
   const sentinel = useRef<HTMLDivElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [toolbarH, setToolbarH] = useState(0);
+
+  // The bar turns translucent as soon as anything slides under it.
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 2);
+    on();
+    window.addEventListener('scroll', on, { passive: true });
+    return () => window.removeEventListener('scroll', on);
+  }, []);
 
   // Publish how much sticky chrome sits above the content (nav bar + toolbar)
   // as --sticky-top, so sticky table headers can park right underneath it.
@@ -54,7 +63,7 @@ export function Page({ title, subtitle, back, actions, toolbar, children, wide, 
       <header
         className={cn(
           'sticky top-0 z-30 transition-[background-color,box-shadow] duration-200',
-          collapsed && !toolbar ? 'material-bar hairline-b' : collapsed ? 'material-bar' : 'bg-bg/0',
+          collapsed && !toolbar ? 'material-bar hairline-b' : collapsed || scrolled ? 'material-bar' : 'bg-bg/0',
           'lg:material-bar lg:hairline-b',
         )}
         style={{ paddingTop: 'var(--safe-top)' }}

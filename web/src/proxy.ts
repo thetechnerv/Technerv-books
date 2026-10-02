@@ -26,6 +26,7 @@ export async function proxy(request: NextRequest) {
   const { data } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
   const isPublic = path.startsWith('/login') || path.startsWith('/auth');
+  // /set-password needs a session, so it stays behind the redirect below.
   if (!data.user && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';

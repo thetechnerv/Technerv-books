@@ -42,3 +42,41 @@ export async function saveMember(fd: FormData): Promise<ActionResult<{ id: strin
   revalidatePath('/', 'layout');
   return { ok: true, data: { id: row.id }, message: 'Member added — set up their sign-in next' };
 }
+
+/** Owner-only: create or reset a member's sign-in and return a 6-digit one-time code. */
+export async function issueSignIn(memberId: string): Promise<ActionResult<{ code: string; expires: string; name: string; email: string }>> {
+  const me = await currentMember();
+  if (me.role !== 'owner') return { ok: false, error: 'Only owners can set up sign-ins.' };
+  if (!isUuid(memberId)) return { ok: false, error: 'Unknown member.' };
+  const { adminDb } = await import('@/lib/db');
+  const { issueTempCode } = await import('@/lib/passwords');
+  const member = must(await adminDb().from('members').select('*').eq('id', memberId).maybeSingle());
+  if (!member) return { ok: false, error: 'Unknown member.' };
+  if (!member.active) return { ok: false, error: 'Reactivate this member first.' };
+  try {
+    const { code, expires } = await issueTempCode(member, me.id);
+    revalidatePath('/settings/members');
+    return { ok: true, data: { code, expires, name: member.full_name, email: member.email } };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+/** Owner-only: block a member from signing in (their records stay). */
+export async function revokeAccess(memberId: string): Promise<ActionResult> {
+  const me = await currentMember();
+  if (me.role !== 'owner') return { ok: false, error: 'Only owners can change sign-ins.' };
+  if (memberId === me.id) return { ok: false, error: 'You can’t remove your own access.' };
+  const { adminDb } = await import('@/lib/db');
+  const { revokeSignIn } = await import('@/lib/passwords');
+  const member = must(await adminDb().from('members').select('*').eq('id', memberId).maybeSingle());
+  if (!member) return { ok: false, error: 'Unknown member.' };
+  try {
+    await revokeSignIn(member);
+    must(await adminDb().from('members').update({ active: false }).eq('id', memberId).select('id'));
+    revalidatePath('/', 'layout');
+    return { ok: true, message: `${member.full_name.split(' ')[0]} can no longer sign in` };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}

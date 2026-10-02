@@ -2,17 +2,30 @@
 
 [← Docs index](README.md) · Related: [Database → RLS](database.md#row-level-security)
 
-## Sign-in
+## Sign-in: email + 4-digit PIN (no emails sent)
 
-- **Email one-time code** (Supabase Auth OTP). `/login` asks for the email, then the 6-digit code;
-  magic links land on `/auth/callback`.
-- **Sign-ups are disabled** (`npm run db -- auth-setup`). Only pre-created users can sign in, and
-  `signInWithOtp` is called with `shouldCreateUser: false`.
-- **Membership** = an active row in `accounts.members` whose `email` matches the signed-in user
-  (or whose `user_id` = `auth.uid()`). `currentMember()` redirects non-members to
-  `/login?error=not-a-member`.
-- Members today: Deeparsh Singh (`deeparshsingh10@gmail.com`), Gursahib Singh (`gursahib99888@gmail.com`).
-  Adding someone: add them in Settings → Members, then run `npm run db -- auth-setup`.
+- `/login`: email (remembered on the device, `localStorage` key `tn-sign-in-email`), then an
+  iOS-style PIN pad (`components/ui/pin-pad.tsx`). Server action `app/login/actions.ts`.
+- **The PIN is never Supabase's password.** `lib/passwords.ts` derives the real Auth password as
+  `"pin1." + base64url(HMAC-SHA256(AUTH_PIN_PEPPER, "email:pin"))`; Supabase stores that bcrypt-hashed.
+  Without the server-only pepper a PIN guess can't be turned into a working password, so guesses must
+  go through our action, which enforces the lockout.
+- **Lockout** (`members.failed_pin_attempts`, `locked_until`): 5 misses → 15-minute lock (and every
+  further 5); 10 → locked until an owner issues a new code. Success resets the counter.
+- **Weak PINs rejected**: all-same digits, runs (1234/9876), repeated pairs (1212).
+- **Onboarding / reset**: an owner opens Settings → Members → Sign-in access → *Set up* / *Reset PIN*.
+  That creates (or resets) the Supabase user with a **6-digit one-time code** (72 h, single use),
+  clears any lockout and sets `must_change_password`. The code is shown once (Copy / Share). The member
+  signs in with "I have a one-time code" and is forced to `/set-password` to choose a PIN.
+  `currentMember()` redirects anyone with `must_change_password` there.
+- `/set-password` always re-asks for the code or current PIN, so a session left open on a lost device
+  can't take over the account after a reset. Change PIN: Settings → Account.
+- Remove access: owner → *Remove access…* (bans the Auth user, marks the member inactive).
+- Bootstrap from a terminal: `cd harness && npm run db -- invite <email>` prints a one-time code.
+- Sign-ups are disabled; only members can sign in. Email OTP/magic links are not used
+  (Supabase's built-in sender is rate-limited).
+- **`AUTH_PIN_PEPPER` must be identical everywhere that shares the database** (`web/.env.local`,
+  Vercel production + preview). Changing or losing it invalidates every PIN — owners then re-issue codes.
 
 ## Development bypass
 
@@ -45,8 +58,6 @@ The sidebar shows "Dev session (no sign-in)" so it's obvious.
 
 ## Before going live
 
-- **Custom SMTP** (Supabase → Auth → SMTP, e.g. Resend): the built-in sender is rate-limited and may
-  only deliver to Supabase org members, so codes might not reach the owners' Gmail.
 - Add the production URL to Auth → URL configuration (site URL + redirect allow-list).
 - **Rotate the personal access token** shared during setup — it can manage every project in the
   org, including the unrelated "TLO" project.

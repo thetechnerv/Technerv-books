@@ -15,6 +15,8 @@ export const currentMember = cache(async (): Promise<Row<'members'>> => {
   if (!email) redirect('/login');
   const member = must(await supabase.from('members').select('*').ilike('email', email).eq('active', true).maybeSingle());
   if (!member) redirect('/login?error=not-a-member');
+  // A temporary password must be replaced before the app can be used.
+  if (member.must_change_password && !(await devBypass())) redirect('/set-password');
   return member;
 });
 

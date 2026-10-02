@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { AlertTriangle, Plus, Terminal } from 'lucide-react';
+import { AlertTriangle, Plus } from 'lucide-react';
 import { Section, Row } from '@/components/ui/group';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +15,6 @@ import type { Row as DbRow } from '@/lib/types';
 
 type Member = DbRow<'members'>;
 
-const COMMAND = 'node harness/bin/db.mjs auth-setup';
 
 function validate(name: string, v: string) {
   if (name === 'full_name') return v.trim() ? null : 'Enter a name.';
@@ -60,7 +59,7 @@ export function Members({ members, meId }: { members: Member[]; meId: string }) 
             value={x.ownership_pct !== null ? `${Number(x.ownership_pct)}%` : '—'}
           >
             {!x.active && <Badge>Inactive</Badge>}
-            {x.active && !x.user_id && <Badge tone="orange">No sign-in</Badge>}
+            
           </Row>
         ))}
       </Section>
@@ -72,16 +71,6 @@ export function Members({ members, meId }: { members: Member[]; meId: string }) 
         </div>
       )}
 
-      <Section title="Signing in" footer="Sign-ups are closed: only people listed here can sign in, with a one-time code sent to their email.">
-        <div className="px-4 py-3 lg:px-3">
-          <p className="text-subhead">After adding a member, run this once from the project folder to create their sign-in:</p>
-          <div className="mt-2 flex items-center gap-2 rounded-[10px] bg-inset px-3 py-2.5 font-mono text-footnote shadow-[inset_0_0_0_0.5px_var(--separator)]">
-            <Terminal className="size-4 shrink-0 text-label-3" />
-            <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap no-scrollbar">{COMMAND}</code>
-            <button type="button" className="shrink-0 text-footnote font-semibold text-accent-text" onClick={() => navigator.clipboard?.writeText(COMMAND)}>Copy</button>
-          </div>
-        </div>
-      </Section>
 
       <EditSheet
         key={ed.key}
@@ -91,7 +80,7 @@ export function Members({ members, meId }: { members: Member[]; meId: string }) 
         saveLabel={m ? 'Save' : 'Add'}
         action={saveMember}
         validate={validate}
-        footer={!m && <p className="px-4 pb-2 text-footnote text-label-2">A personal account is created for them so out-of-pocket spending can be recorded. Then run <code className="font-mono">{COMMAND}</code> to give them a sign-in.</p>}
+        footer={!m && <p className="px-4 pb-2 text-footnote text-label-2">A personal account is created for them so out-of-pocket spending can be recorded. Then use <b>Sign-in access → Set up</b> below to give them a temporary password.</p>}
       >
         {m && <input type="hidden" name="id" value={m.id} />}
         <div className="flex justify-center pb-4">
