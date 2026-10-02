@@ -8,8 +8,8 @@
 - [ ] Replace placeholder company details (Settings → Company, Branding & invoices)
 - [ ] Confirm fiscal year-end, GST period, ownership %, mileage rates
 - [ ] Supabase custom SMTP (e.g. Resend) so sign-in codes reach Gmail
-- [ ] Choose hosting (Netlify / Cloudflare free, or Vercel Pro); set env vars **without** `DEV_AUTH_BYPASS_EMAIL`
-- [ ] Add production URL to Supabase Auth site URL + redirect allow-list
+- [x] Hosting: Vercel (`technerv-books.vercel.app`), env vars set without `DEV_AUTH_BYPASS_EMAIL` — consider Pro (Hobby is non-commercial)
+- [x] Production URL added to Supabase Auth site URL + redirect allow-list
 - [ ] Rotate the Supabase personal access token used during setup
 - [ ] Import real opening balances (EQ CAD/USD, card) and the current fiscal year's statements
 - [ ] Accountant review of categories/GIFI and tax flags

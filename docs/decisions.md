@@ -4,6 +4,16 @@
 
 Newest first. Add a line whenever behaviour, scope or an assumption changes.
 
+## 2026-10-02 — Deployed to Vercel
+- Vercel project `technerv-books` (team tech-nerv), Git-connected to `thetechnerv/Technerv-books`, root directory `web`.
+  Production: https://technerv-books.vercel.app
+- First deploy returned 500 on every route: no env vars ("URL and Key are required to create a Supabase client").
+  Added `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (prod/preview/dev) and
+  `SUPABASE_SECRET_KEY` (sensitive, prod/preview). `DEV_AUTH_BYPASS_EMAIL` deliberately NOT set.
+- Supabase Auth site URL → production URL; redirect allow-list includes production, preview
+  (`technerv-books-*-tech-nerv.vercel.app`) and localhost.
+- Still open: custom SMTP so sign-in codes reach Gmail reliably. Note: Vercel Hobby is for non-commercial use — consider Pro.
+
 ## 2026-10-02 — PWA
 - Installable home-screen app: full manifest + shortcuts, generated icons/maskable/splash screens for
   16 Apple devices, privacy-first service worker (static assets only, offline page), update toast,
