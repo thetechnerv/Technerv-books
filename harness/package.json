@@ -1,0 +1,12 @@
+{
+  "name": "technerv-db-harness",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "db": "node bin/db.mjs",
+    "migrate": "node bin/db.mjs migrate",
+    "seed": "node bin/db.mjs seed",
+    "test": "node bin/db.mjs test",
+    "status": "node bin/db.mjs status"
+  }
+}
